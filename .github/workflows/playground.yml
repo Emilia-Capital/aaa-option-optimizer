@@ -1,0 +1,16 @@
+name: Playground Comment
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            **Test on Playground**
+            [Test this pull request on the Playground](https://playground.wordpress.net/#{"landingPage":"/wp-admin/tools.php?page=aaa-option-optimizer","features":{"networking":true},"steps":[{"step":"login","username":"admin","password":"password"},{"step":"installPlugin","pluginZipFile":{"resource":"url","url":"https://bypass-cors.altha.workers.dev/${{ github.server_url }}/${{ github.repository }}/archive/${{ github.sha }}.zip"},"options":{"activate":true}}]})

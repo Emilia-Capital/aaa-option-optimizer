@@ -1,0 +1,69 @@
+name: Lint
+
+on:
+  # Run on pushes to select branches and on all pull requests.
+  push:
+    branches:
+      - main
+      - develop
+      - 'release/[0-9]+.[0-9]+*'
+      - 'hotfix/[0-9]+.[0-9]+*'
+  pull_request:
+  # Allow manually triggering the workflow.
+  workflow_dispatch:
+
+# Cancels all previous workflow runs for the same branch that have not yet completed.
+concurrency:
+  # The concurrency group contains the workflow name and the branch name.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        # Lint against the highest/lowest supported versions of each PHP major.
+        # And also do a run against "nightly" (the current dev version of PHP).
+        php_version: ['7.4', '8.0', '8.1', '8.2']
+
+    name: "Lint: PHP ${{ matrix.php_version }}"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install PHP for the composer install
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+          coverage: none
+
+      # The lint stage doesn't use code style, so no need for WPCS or phpcompatibility.
+      - name: 'Composer: adjust dependencies - remove PHPCompatibility'
+        run: composer remove --no-update --dev phpcompatibility/phpcompatibility-wp --no-scripts --no-interaction
+      - name: 'Composer: adjust dependencies - remove WPCS'
+        run: composer remove --no-update --dev wp-coding-standards/wpcs --no-scripts --no-interaction
+
+      # Install dependencies and handle caching in one go.
+      # @link https://github.com/marketplace/actions/install-composer-dependencies
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          # Bust the cache at least once a month - output format: YYYY-MM-DD.
+          custom-cache-suffix: $(date -u -d "-0 month -$(($(date +%d)-1)) days" "+%F")
+
+      - name: Install PHP for the actual test
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php_version }}
+          ini-values: zend.assertions=1, error_reporting=-1, display_errors=On
+          coverage: none
+          tools: cs2pr
+
+      - name: Lint against parse errors
+        run: composer lint -- --checkstyle | cs2pr
+
+      - name: Lint blueprint file
+        run: composer lint-blueprint
