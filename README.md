@@ -5,6 +5,8 @@
 # AAA Option Optimizer
 Plugin that tracks autoloaded options usage and allows the user to optimize them.
 
+![Screenshot of the admin panel](/screenshot-1.png)
+
 ## Frequently Asked Questions
 
 ### Why the AAA prefix in the plugin name?
