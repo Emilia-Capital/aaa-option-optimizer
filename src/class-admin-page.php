@@ -78,7 +78,8 @@ class Admin_Page {
 		</style>';
 		echo '<div class="wrap"><h1>' . esc_html__( 'AAA Option Optimizer', 'aaa-option-optimizer' ) . '</h1>';
 
-		echo '<p>' . sprintf( __( 'When you started on %1$s you had %2$sMB of autoloaded options. Now you have: ', '' ), date( 'Y-m-d', strtotime( $option_optimizer['starting_point_date'] ) ), number_format( ( $option_optimizer['starting_point_kb'] / 1024 ), 2 ) );
+		// translators: %1$s is the date, %2$s is the size in KB.
+		echo '<p>' . sprintf( esc_html__( 'When you started on %1$s you had %2$sMB of autoloaded options. Now you have: ', 'aaa-option-optimizer' ), esc_html( gmdate( 'Y-m-d', strtotime( $option_optimizer['starting_point_date'] ) ) ), number_format( ( $option_optimizer['starting_point_kb'] / 1024 ), 2 ) );
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$autoload_size = $wpdb->get_var( "SELECT SUM(LENGTH(option_value)) as autoload_size FROM {$wpdb->options} WHERE autoload='yes'" );

@@ -7,9 +7,9 @@
 
 namespace Emilia\OptionOptimizer;
 
-use \WP_Error;
-use \WP_REST_Request;
-use \WP_REST_Response;
+use WP_Error;
+use WP_REST_Request;
+use WP_REST_Response;
 
 /**
  * REST functionality of AAA Option Optimizer.

@@ -100,7 +100,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="fewer-tags"/>
+				<element value="aaa-option-optimizer"/>
 			</property>
 		</properties>
 	</rule>
@@ -108,8 +108,8 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="FewerTags"/>
-				<element value="fewer_tags"/>
+				<element value="Emilia"/>
+				<element value="AAA"/>
 			</property>
 		</properties>
 	</rule>
