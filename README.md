@@ -8,7 +8,7 @@ This plugin tracks which of the autoloaded options are used on a page, and store
 ## How to use this plugin
 Install this plugin, and go through your entire site. Best is to use it normally for a couple of days, or to visit every page on your site and in your admin manually. Then go to the plugin's settings screen, and go through the unused options. You can either decide to remove an unused option (they might for instance be for plugins you no longer use), or to set it to not autoload. The latter action is much less destructive: it'll still be there, but it just won't be autoloaded.
 
-![Screenshot of the admin panel](/screenshot-1.png)
+![Screenshot of the admin panel](/.wordpress-org/screenshot-1.png)
 
 ## Frequently Asked Questions
 
