@@ -3,7 +3,10 @@
 [![Security](https://github.com/emilia-capital/aaa-option-optimizer/actions/workflows/security.yml/badge.svg)](https://github.com/emilia-capital/aaa-option-optimizer/actions/workflows/security.yml)
 
 # AAA Option Optimizer
-Plugin that tracks autoloaded options usage and allows the user to optimize them.
+This plugin tracks which of the autoloaded options are used on a page, and stores that data at the end of page render. It keeps an array of options that it has seen as being used. On the admin page, it compares all the autoloaded options to the array of stored options, and shows the autoloaded options that have not been used yet.
+
+## How to use this plugin
+Install this plugin, and go through your entire site. Best is to use it normally for a couple of days, or to visit every page on your site and in your admin manually. Then go to the plugin's settings screen, and go through the unused options. You can either decide to remove an unused option (they might for instance be for plugins you no longer use), or to set it to not autoload. The latter action is much less destructive: it'll still be there, but it just won't be autoloaded.
 
 ![Screenshot of the admin panel](/screenshot-1.png)
 
