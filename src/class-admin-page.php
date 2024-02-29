@@ -78,13 +78,22 @@ class Admin_Page {
 		</style>';
 		echo '<div class="wrap"><h1>' . esc_html__( 'AAA Option Optimizer', 'aaa-option-optimizer' ) . '</h1>';
 
-		// translators: %1$s is the date, %2$s is the size in KB.
-		echo '<p>' . sprintf( esc_html__( 'When you started on %1$s you had %2$sMB of autoloaded options. Now you have: ', 'aaa-option-optimizer' ), esc_html( gmdate( 'Y-m-d', strtotime( $option_optimizer['starting_point_date'] ) ) ), number_format( ( $option_optimizer['starting_point_kb'] / 1024 ), 2 ) );
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$autoload_size = $wpdb->get_var( "SELECT SUM(LENGTH(option_value)) as autoload_size FROM {$wpdb->options} WHERE autoload='yes'" );
-		echo number_format( ( $autoload_size / 1024 / 1024 ), 2 ) . 'MB.';
-		// Render differences.
+		$result = $wpdb->get_row( "SELECT count(*) AS count, SUM(LENGTH(option_value)) as autoload_size FROM {$wpdb->options} WHERE autoload='yes'" );
+
+		// translators: %1$s is the date, %2$s is the number of options at stat, %3$s is the size at start in KB, %4$s is the number of options now, %5$s is the size in KB now.
+		echo '<p>' . 
+			sprintf( 
+				esc_html__( 'When you started on %1$s you had %2$s autoloaded options, for %3$sKB of memory. Now you have %4$s options, for %5$sKB of memory.', 'aaa-option-optimizer' ),
+				esc_html( gmdate( 'Y-m-d', strtotime( $option_optimizer['starting_point_date'] ) ) ), 
+				$option_optimizer['starting_point_num'],
+				number_format( ( $option_optimizer['starting_point_kb'] ), 1 ),
+				$result->count,
+				number_format( ( $result->autoload_size / 1024 ), 1 )
+			) . '</p>';
+
+			// Render differences.
 		echo '<h2>' . esc_html__( 'Unused Autoloaded Options', 'aaa-option-optimizer' ) . '</h2>';
 		if ( ! empty( $unused_options ) ) {
 			echo '<table class="aaa_option_table">';

@@ -29,11 +29,12 @@ register_activation_hook( __FILE__, 'aaa_option_optimizer_activation' );
 function aaa_option_optimizer_activation() {
 	global $wpdb;
 	//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- one time query, no caching needed.
-	$autoload_size = $wpdb->get_var( "SELECT SUM(LENGTH(option_value)) as autoload_size FROM {$wpdb->options} WHERE autoload='yes'" );
+	$result = $wpdb->get_row( "SELECT count(*) AS count, SUM(LENGTH(option_value)) as autoload_size FROM {$wpdb->options} WHERE autoload='yes'" );
 	update_option(
 		'option_optimizer',
 		[
-			'starting_point_kb'   => $autoload_size / 1024,
+			'starting_point_kb'   => ( $result->autoload_size / 1024 ),
+			'starting_point_num'  => $result->count,
 			'starting_point_date' => current_time( 'mysql' ),
 			'used_options'        => [],
 		],

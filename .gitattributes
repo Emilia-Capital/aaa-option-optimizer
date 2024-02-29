@@ -19,6 +19,7 @@ composer.lock export-ignore
 phpunit.xml.dist export-ignore
 /README.md export-ignore
 /tests export-ignore
+/.wordpress-org export-ignore
 
 #
 # Auto detect text files and perform LF normalization
