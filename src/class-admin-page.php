@@ -98,9 +98,9 @@ class Admin_Page {
 		if ( ! empty( $unused_options ) ) {
 			echo '<table class="aaa_option_table">';
 			echo '<tr>';
-			echo '<th>Option</th>';
-			echo '<th>Size</th>';
-			echo '<th>Actions</th>';
+			echo '<th>' . esc_html__( 'Option', 'aaa-option-optimizer' ) . '</th>';
+			echo '<th>' . esc_html__( 'Size', 'aaa-option-optimizer' ) . '</th>';
+			echo '<th>' . esc_html__( 'Actions', 'aaa-option-optimizer' ) . '</th>';
 			echo '</tr>';
 			foreach ( $unused_options as $option ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '"><td>' . esc_html( $option ) . '</td>';
