@@ -22,6 +22,8 @@ class Plugin {
 	 * Registers hooks.
 	 */
 	public function register_hooks() {
+		$this->accessed_options = get_option( 'option_optimizer', [ 'used_options' => [] ] )['used_options'];
+
 		// Hook into all actions and filters to monitor option accesses.
 		add_filter( 'all', [ $this, 'monitor_option_accesses' ] );
 
@@ -62,21 +64,25 @@ class Plugin {
 	 */
 	protected function add_option_usage( $option_name ) {
 		// Check if this option hasn't been tracked yet and add it to the array.
-		if ( ! in_array( $option_name, $this->accessed_options, true ) ) {
-			$this->accessed_options[] = $option_name;
+		if ( ! array_key_exists( $option_name, $this->accessed_options ) ) {
+			$this->accessed_options[ $option_name ] = 1;
+			return;
 		}
+		++$this->accessed_options[ $option_name ];
 	}
 
 	/**
 	 * Update the 'option_optimizer' option with the list of used options at the end of the page load.
 	 */
 	public function update_tracked_options() {
+		// phpcs:ignore WordPress.Security.NonceVerification -- not doing anything.
+		if ( isset( $_GET['page'] ) && $_GET['page'] === 'aaa-option-optimizer' ) {
+			return;
+		}
 		// Retrieve the existing option_optimizer data.
 		$option_optimizer = get_option( 'option_optimizer', [ 'used_options' => [] ] );
 
-		// Merge the newly accessed options with the existing ones, avoiding duplicates.
-		$updated_used_options             = array_unique( array_merge( $option_optimizer['used_options'], $this->accessed_options ) );
-		$option_optimizer['used_options'] = $updated_used_options;
+		$option_optimizer['used_options'] = $this->accessed_options;
 
 		// Update the 'option_optimizer' option with the new list.
 		update_option( 'option_optimizer', $option_optimizer, true );

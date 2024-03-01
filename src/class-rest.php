@@ -79,14 +79,23 @@ class REST {
 	 */
 	public function update_option_autoload( $request ) {
 		$option_name  = $request['option_name'];
-		$autoload     = $request['autoload'] === 'yes' ? 'yes' : 'no';
+		$autoload     = $request['autoload'];
 		$option_value = get_option( $option_name );
+
+		if ( ! in_array( $autoload, [ 'yes', 'no' ], true ) ) {
+			return new \WP_Error( 'invalid_autoload_value', 'Invalid autoload value', [ 'status' => 400 ] );
+		}
 
 		if ( false === $option_value ) {
 			return new \WP_Error( 'option_not_found', 'Option does not exist', [ 'status' => 404 ] );
 		}
 
-		update_option( $option_name, $option_value, $autoload );
+		delete_option( $option_name );
+		$succeeded = add_option( $option_name, $option_value, '', $autoload );
+
+		if ( ! $succeeded ) {
+			return new \WP_Error( 'update_failed', 'Updating the option failed', [ 'status' => 400 ] );
+		}
 		return new \WP_REST_Response( [ 'success' => true ], 200 );
 	}
 

@@ -21,6 +21,8 @@
 	<!-- Exclude the Coverage output directory. -->
 	<exclude-pattern>/coverage/*</exclude-pattern>
 
+	<exclude-pattern>/js/vendor/*</exclude-pattern>
+
 	<!-- Exclude minified Javascript files. -->
 	<exclude-pattern>*.min.js</exclude-pattern>
 
@@ -72,13 +74,10 @@
 	For more information, also see:
 	https://github.com/PHPCompatibility/PHPCompatibility
 	-->
-	<!--
-	<config name="testVersion" value="5.6-"/>
+	<config name="testVersion" value="7.4-"/>
 	<rule ref="PHPCompatibilityWP">
 		<include-pattern>*\.php</include-pattern>
 	</rule>
-	-->
-
 
 	<!--
 	#############################################################################
