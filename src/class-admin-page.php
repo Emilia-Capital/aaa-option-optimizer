@@ -77,11 +77,14 @@ class Admin_Page {
 	 * @return string
 	 */
 	private function get_length( $value ) {
-		if ( is_array( $value ) ) {
+		if ( is_array( $value ) || is_object( $value ) ) {
 			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- intended here.
 			$length = strlen( serialize( $value ) );
-		} else {
-			$length = strlen( $value );
+		} else if ( is_string( $value ) || is_numeric( $value ) ) {
+			$length = strlen( strval( $value ) );
+		}
+		if ( ! isset( $length ) ) {
+			return '-';
 		}
 		return number_format( ( $length / 1024 ), 2 );
 	}
