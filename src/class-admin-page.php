@@ -80,7 +80,7 @@ class Admin_Page {
 		if ( is_array( $value ) || is_object( $value ) ) {
 			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- intended here.
 			$length = strlen( serialize( $value ) );
-		} else if ( is_string( $value ) || is_numeric( $value ) ) {
+		} elseif ( is_string( $value ) || is_numeric( $value ) ) {
 			$length = strlen( strval( $value ) );
 		}
 		if ( ! isset( $length ) ) {
