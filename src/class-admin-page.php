@@ -99,9 +99,9 @@ class Admin_Page {
 	private function print_value( $value ) {
 		if ( is_array( $value ) ) {
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r -- intended here.
-			return '<code>' . print_r( $value, 1 ) . '</code>';
+			return print_r( $value, 1 );
 		}
-		return '<code>' . esc_html( $value ) . '</code>';
+		return esc_html( $value );
 	}
 
 	/**
