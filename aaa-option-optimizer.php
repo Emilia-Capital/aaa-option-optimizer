@@ -8,6 +8,7 @@
  * Plugin URI: https://joost.blog/plugins/aaa-option-optimizer/
  * Description: Tracks autoloaded options usage and allows the user to optimize them.
  * Version: 1.0
+ * License: GPL-3.0+
  * Author: Joost de Valk
  * Author URI: https://joost.blog/
  * Text Domain: aaa-option-optimizer
