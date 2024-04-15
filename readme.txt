@@ -2,7 +2,7 @@
 Contributors: joostdevalk
 Tags: options, database, cleanup
 Requires at least: 6.2
-Tested up to: 6.4
+Tested up to: 6.5
 Requires PHP: 7.4
 Stable tag: 1.0
 License: GPL3+
@@ -40,4 +40,4 @@ Yes!! Backup your database.
 
 = 1.0 =
 
-Initial release on GitHub.
+Initial release on GitHub and WordPress.org.
