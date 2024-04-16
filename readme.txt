@@ -27,6 +27,10 @@ starting the name with AAA made sense.
 
 Yes!! Backup your database.
 
+= How can I report security bugs? =
+
+You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/aaa-option-optimizer)
+
 == Installation ==
 1. Search for AAA Option Optimizer on the repository.
 2. Install the plugin.
@@ -34,6 +38,7 @@ Yes!! Backup your database.
 4. Go to the plugin's admin page and optimize your option usage.
 
 == Screenshots ==
+
 1. Screenshot of the admin screen.
 
 == Changelog ==
