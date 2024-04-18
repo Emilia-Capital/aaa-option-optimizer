@@ -201,6 +201,7 @@ class Admin_Page {
 			echo '<thead>';
 			echo '<tr>';
 			echo '<th>' . esc_html__( 'Option', 'aaa-option-optimizer' ) . '</th>';
+			echo '<th>' . esc_html__( 'Plugin/Theme', 'aaa-option-optimizer' ) . '</th>';
 			echo '<th>' . esc_html__( 'Size', 'aaa-option-optimizer' ) . '</th>';
 			echo '<th>' . esc_html__( 'Value', 'aaa-option-optimizer' ) . '</th>';
 			echo '<th>' . esc_html__( 'Actions', 'aaa-option-optimizer' ) . '</th>';
@@ -210,6 +211,7 @@ class Admin_Page {
 			foreach ( $unused_options as $option => $value ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '"><td>' . esc_html( $option ) . '</td>';
 				echo '<td>' . esc_html( $this->get_length( $value ) ) . 'KB</td>';
+				echo '<td>' . $this->get_plugin_name( $option ) . 'KB</td>';
 				echo '<td class="value">' . esc_html( $this->print_value( $value ) ) . '</td>';
 				echo '<td><button class="button remove-autoload" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Remove Autoload', 'aaa-option-optimizer' ) . '</button> ';
 				echo ' <button class="button delete-option" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Delete Option', 'aaa-option-optimizer' ) . '</button></td></tr>';
@@ -228,6 +230,7 @@ class Admin_Page {
 			echo '<thead>';
 			echo '<tr>';
 			echo '<th>' . esc_html__( 'Option', 'aaa-option-optimizer' ) . '</th>';
+			echo '<th>' . esc_html__( 'Plugin/Theme', 'aaa-option-optimizer' ) . '</th>';
 			echo '<th>' . esc_html__( 'Size', 'aaa-option-optimizer' ) . '</th>';
 			echo '<th>' . esc_html__( 'Value', 'aaa-option-optimizer' ) . '</th>';
 			echo '<th>' . esc_html__( '# Calls', 'aaa-option-optimizer' ) . '</th>';
@@ -238,6 +241,7 @@ class Admin_Page {
 			foreach ( $non_autoloaded_options_full as $option => $arr ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '">';
 				echo '<td>' . esc_html( $option ) . '</td>';
+				echo '<td>' . $this->get_plugin_name( $option ) . 'KB</td>';
 				echo '<td>' . esc_html( $this->get_length( $arr['value'] ) ) . 'KB</td>';
 				echo '<td class="value">' . esc_html( $this->print_value( $arr['value'] ) ) . '</td>';
 				echo '<td>' . esc_html( $arr['count'] ) . '</td>';
@@ -256,6 +260,7 @@ class Admin_Page {
 			echo '<thead>';
 			echo '<tr>';
 			echo '<th>' . esc_html__( 'Option', 'aaa-option-optimizer' ) . '</th>';
+			echo '<th>' . esc_html__( 'Plugin/Theme', 'aaa-option-optimizer' ) . '</th>';
 			echo '<th>' . esc_html__( '# Calls', 'aaa-option-optimizer' ) . '</th>';
 			echo '<th>' . esc_html__( 'Actions', 'aaa-option-optimizer' ) . '</th>';
 			echo '</tr>';
@@ -264,6 +269,7 @@ class Admin_Page {
 			foreach ( $options_that_do_not_exist as $option => $count ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '">';
 				echo '<td>' . esc_html( $option ) . '</td>';
+				echo '<td>' . $this->get_plugin_name( $option ) . 'KB</td>';
 				echo '<td>' . esc_html( $count ) . '</td>';
 				echo '<td><button class="button add-autoload" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Create Option with value false', 'aaa-option-optimizer' ) . '</button> ';
 			}
@@ -272,5 +278,25 @@ class Admin_Page {
 		}
 
 		echo '</div>'; // Close .wrap.
+	}
+
+	/**
+	 * Find plugin in known plugin prefixes list
+	 *
+	 * @param $option
+	 *
+	 * @return mixed|string|null
+	 */
+	private function get_plugin_name( $option ) {
+		$plugins_list = [];
+		require_once plugin_dir_path( __FILE__ ) . 'known-plugins/known-plugins.php';
+		//for each plugin in the list, check if the option starts with the prefix
+		foreach ( $plugins_list as $plugin ) {
+			if ( strpos( $option, $plugin['option_prefix'] ) === 0 ) {
+				return esc_html($plugin['name']);
+			}
+		}
+
+		return esc_html__("Unknown plugin", "aaa-option-optimizer");
 	}
 }
