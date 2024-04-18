@@ -97,7 +97,7 @@ class Admin_Page {
 	 * @return string
 	 */
 	private function print_value( $value ) {
-		if ( is_array( $value ) ) {
+		if ( is_array( $value ) || is_object( $value ) ) {
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r -- intended here.
 			return print_r( $value, 1 );
 		}
