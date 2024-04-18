@@ -294,17 +294,17 @@ class Admin_Page {
 	 * Get html to show a popover
 	 *
 	 * @param string $id
-	 * @param mixed $value
+	 * @param mixed  $value
 	 *
 	 * @return string
 	 */
-	private function get_popover_html( $id, $value ): string {
+	private function get_popover_html( string $id, $value ): string {
 		$string = is_string($value) ? $value : json_encode($value);
-		$id = 'aaa-option-optimizer-'.esc_attr($id);
+		$id = 'aaa-option-optimizer-' . esc_attr($id);
 		return '
-		<button class="button" popovertarget="'.$id.'">'.__("Show value", "aaa-option-optimizer").'</button>
+		<button class="button" popovertarget="'.$id.'">' . esc_html__( 'Show value', 'aaa-option-optimizer' ) . '</button>
 		<div id="'.$id.'" popover class="aaa-option-optimizer-popover">
-		  <button class="aaa-option-optimizer-popover__close" popovertarget="'.$id.'" popovertargetaction="hide">X</button>
+		  <button class="aaa-option-optimizer-popover__close" popovertarget="' . $id . '" popovertargetaction="hide">X</button>
 		  ' . esc_html( $string ) .'
 		</div>';
 	}
