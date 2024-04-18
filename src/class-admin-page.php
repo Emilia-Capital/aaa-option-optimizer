@@ -11,6 +11,7 @@ namespace Emilia\OptionOptimizer;
  * Admin page functionality for AAA Option Optimizer.
  */
 class Admin_Page {
+	private $plugins_list = [];
 	/**
 	 * Register hooks.
 	 */
@@ -210,8 +211,8 @@ class Admin_Page {
 			echo '<tbody>';
 			foreach ( $unused_options as $option => $value ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '"><td>' . esc_html( $option ) . '</td>';
+				echo '<td>' . $this->get_plugin_name( $option ) . '</td>';
 				echo '<td>' . esc_html( $this->get_length( $value ) ) . 'KB</td>';
-				echo '<td>' . $this->get_plugin_name( $option ) . 'KB</td>';
 				echo '<td class="value">' . esc_html( $this->print_value( $value ) ) . '</td>';
 				echo '<td><button class="button remove-autoload" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Remove Autoload', 'aaa-option-optimizer' ) . '</button> ';
 				echo ' <button class="button delete-option" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Delete Option', 'aaa-option-optimizer' ) . '</button></td></tr>';
@@ -241,7 +242,7 @@ class Admin_Page {
 			foreach ( $non_autoloaded_options_full as $option => $arr ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '">';
 				echo '<td>' . esc_html( $option ) . '</td>';
-				echo '<td>' . $this->get_plugin_name( $option ) . 'KB</td>';
+				echo '<td>' . $this->get_plugin_name( $option ) . '</td>';
 				echo '<td>' . esc_html( $this->get_length( $arr['value'] ) ) . 'KB</td>';
 				echo '<td class="value">' . esc_html( $this->print_value( $arr['value'] ) ) . '</td>';
 				echo '<td>' . esc_html( $arr['count'] ) . '</td>';
@@ -269,7 +270,7 @@ class Admin_Page {
 			foreach ( $options_that_do_not_exist as $option => $count ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '">';
 				echo '<td>' . esc_html( $option ) . '</td>';
-				echo '<td>' . $this->get_plugin_name( $option ) . 'KB</td>';
+				echo '<td>' . $this->get_plugin_name( $option ) . '</td>';
 				echo '<td>' . esc_html( $count ) . '</td>';
 				echo '<td><button class="button add-autoload" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Create Option with value false', 'aaa-option-optimizer' ) . '</button> ';
 			}
@@ -281,19 +282,25 @@ class Admin_Page {
 	}
 
 	/**
-	 * Find plugin in known plugin prefixes list
+	 * Find plugin in known plugin prefixes list.
 	 *
-	 * @param $option
+	 * @param string $option
 	 *
-	 * @return mixed|string|null
+	 * @return string
 	 */
-	private function get_plugin_name( $option ) {
+	private function get_plugin_name( string $option ): string {
 		$plugins_list = [];
-		require_once plugin_dir_path( __FILE__ ) . 'known-plugins/known-plugins.php';
-		//for each plugin in the list, check if the option starts with the prefix
-		foreach ( $plugins_list as $plugin ) {
-			if ( strpos( $option, $plugin['option_prefix'] ) === 0 ) {
-				return esc_html($plugin['name']);
+		if ( empty( $this->plugins_list ) ) {
+			require_once plugin_dir_path( AAA_OPTION_OPTIMIZER_FILE ) . 'known-plugins/known-plugins.php';
+			$this->plugins_list = $plugins_list;
+		}
+
+		//for each plugin in the list, check if the option starts with the prefix.
+		foreach ( $this->plugins_list as $plugin ) {
+			foreach ( $plugin['option_prefixes'] as $prefix ) {
+				if ( strpos( $option, $prefix ) === 0 ) {
+					return esc_html( $plugin['name'] );
+				}
 			}
 		}
 

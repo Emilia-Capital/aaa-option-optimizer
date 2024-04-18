@@ -7,13 +7,13 @@
 jQuery( document ).ready(
 	function ($) {
 		if ( $( '#unused_options_table' ).length ) {
-			let table = new DataTable( '#unused_options_table', { responsive: true, columns: [ { width: '20%' }, { searchable: false, width: '10%' }, { searchable: false, width: '50%' }, { searchable: false, width: '20%' } ] } );
+			let table = new DataTable( '#unused_options_table', { responsive: true, columns: [ { width: '20%' }, { width: '20%' },{ searchable: false, width: '10%' }, { searchable: false, width: '50%' }, { searchable: false, width: '20%' } ] } );
 		}
 		if ( $( '#used_not_autloaded_table' ).length ) {
-			let table = new DataTable( '#used_not_autloaded_table', { columns: [ null, { searchable: false }, { searchable: false }, { searchable: false }, { searchable: false } ] } );
+			let table = new DataTable( '#used_not_autloaded_table', { columns: [ null, null, { searchable: false }, { searchable: false }, { searchable: false }, { searchable: false } ] } );
 		}
 		if ( $( '#requested_do_not_exist_table' ).length ) {
-			let table = new DataTable( '#requested_do_not_exist_table', { columns: [ null, { searchable: false }, { searchable: false } ] } );
+			let table = new DataTable( '#requested_do_not_exist_table', { columns: [ null, null, { searchable: false }, { searchable: false } ] } );
 		}
 
 		// Handle the "Remove Autoload" button click.

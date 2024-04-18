@@ -1,25 +1,42 @@
 <?php
 	defined( 'ABSPATH' ) or die();
 
-	$plugins_list = [
-		'woocommerce' => [
-			'name' => 'WooCommerce',
-			'option_prefix' => 'wc_',
-		],
-		'easy-digital-downloads' => [
-			'name' => 'Easy Digital Downloads',
-			'option_prefix' => 'edd_',
-		],
-		'complianz' => [
-			'name' => 'Complianz GDPR',
-			'option_prefix' => 'cmplz_',
-		],
-		'burst' => [
-			'name' => 'Burst Statistics',
-			'option_prefix' => 'burst_',
-		],
-		'really-simple-ssl' => [
-			'name' => 'Really Simple SSL',
-			'option_prefix' => 'rsssl_',
-		],
-	];
+$plugins_list = [
+	'aaa-option-optimizer' => [
+		'name' => 'AAA Option Optimizer',
+		'option_prefixes' => ['option_optimizer'],
+	],
+	'burst' => [
+		'name' => 'Burst Statistics',
+		'option_prefixes' => ['burst_'],
+	],
+	'complianz' => [
+		'name' => 'Complianz GDPR',
+		'option_prefixes' => ['cmplz_'],
+	],
+	'easy-digital-downloads' => [
+		'name' => 'Easy Digital Downloads',
+		'option_prefixes' => ['edd_'],
+	],
+	'elementor' => [
+		'name' => 'Elementor',
+		'option_prefixes' => ['elementor_'],
+	],
+	'really-simple-ssl' => [
+		'name' => 'Really Simple SSL',
+		'option_prefixes' => ['rsssl_'],
+	],
+	'woocommerce' => [
+		'name' => 'WooCommerce',
+		'option_prefixes' => ['wc_', '_transient__woocommerce_'],
+	],
+	'wordpress' => [
+		'name' => 'WordPress',
+		'option_prefixes' => ['_site_transient_update_core', '_site_transient_timeout_theme_roots', '_site_transient_timeout_available_translations'],
+	],
+	'wpml' => [
+		'name' => 'WPML',
+		'option_prefixes' => ['_wpml_'],
+	],
+];
+
