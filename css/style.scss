@@ -1,0 +1,25 @@
+.aaa-option-optimizer-popover {
+  font-family: sans-serif;
+  overflow: visible;
+  padding: 40px 40px 20px 20px;
+  position: fixed;
+  word-wrap: break-word;
+  max-width: 80%;
+  min-height: 200px;
+  &::backdrop {
+    background: rgb(0 0 0 / 75%);
+  }
+  &__close {
+    background: none!important;
+    border: none;
+    padding: 5px;
+    margin: 5px;
+    z-index: 10;
+    position: absolute;
+    top: 0;
+    right: 0;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}

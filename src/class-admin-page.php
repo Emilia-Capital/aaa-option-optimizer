@@ -35,7 +35,19 @@ class Admin_Page {
 	/**
 	 * Enqueue our scripts.
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts( $hook ) {
+		error_log($hook);
+		if ( $hook !== 'tools_page_aaa-option-optimizer') {
+			return;
+		}
+
+		wp_enqueue_style(
+			'aaa-option-optimizer',
+			plugin_dir_url( AAA_OPTION_OPTIMIZER_FILE ) . 'css/style.min.css',
+			[],
+			'2.0.1'
+		);
+
 		wp_enqueue_script(
 			'datatables',
 			plugin_dir_url( AAA_OPTION_OPTIMIZER_FILE ) . 'js/vendor/dataTables.min.js',
@@ -210,7 +222,9 @@ class Admin_Page {
 			foreach ( $unused_options as $option => $value ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '"><td>' . esc_html( $option ) . '</td>';
 				echo '<td>' . esc_html( $this->get_length( $value ) ) . 'KB</td>';
-				echo '<td class="value">' . esc_html( $this->print_value( $value ) ) . '</td>';
+				echo '<td class="value">';
+				echo $this->get_popover_html( $option, $value );
+				echo '</td>';
 				echo '<td><button class="button remove-autoload" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Remove Autoload', 'aaa-option-optimizer' ) . '</button> ';
 				echo ' <button class="button delete-option" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Delete Option', 'aaa-option-optimizer' ) . '</button></td></tr>';
 			}
@@ -239,7 +253,9 @@ class Admin_Page {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '">';
 				echo '<td>' . esc_html( $option ) . '</td>';
 				echo '<td>' . esc_html( $this->get_length( $arr['value'] ) ) . 'KB</td>';
-				echo '<td class="value">' . esc_html( $this->print_value( $arr['value'] ) ) . '</td>';
+				echo '<td class="value">';
+				echo $this->get_popover_html( $option, $arr['value'] );
+				echo '</td>';
 				echo '<td>' . esc_html( $arr['count'] ) . '</td>';
 				echo '<td><button class="button add-autoload" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Add Autoload', 'aaa-option-optimizer' ) . '</button> ';
 			}
@@ -272,5 +288,24 @@ class Admin_Page {
 		}
 
 		echo '</div>'; // Close .wrap.
+	}
+
+	/**
+	 * Get html to show a popover
+	 *
+	 * @param string $id
+	 * @param mixed $value
+	 *
+	 * @return string
+	 */
+	private function get_popover_html( $id, $value ): string {
+		$string = is_string($value) ? $value : json_encode($value);
+		$id = 'aaa-option-optimizer-'.esc_attr($id);
+		return '
+		<button class="button" popovertarget="'.$id.'">'.__("Show value", "aaa-option-optimizer").'</button>
+		<div id="'.$id.'" popover class="aaa-option-optimizer-popover">
+		  <button class="aaa-option-optimizer-popover__close" popovertarget="'.$id.'" popovertargetaction="hide">X</button>
+		  ' . esc_html( $string ) .'
+		</div>';
 	}
 }
