@@ -45,7 +45,7 @@ jQuery( document ).ready(
 								.draw( 'page' );
 						},
 						error: function (response) {
-							console.log(response);
+							console.log( response );
 							alert( 'Failed to add autoload for ' + optionName );
 						}
 					}
@@ -53,6 +53,7 @@ jQuery( document ).ready(
 			}
 		);
 
+		// Handle the "Remove autoload" button click.
 		$( 'table tbody' ).on(
 			'click',
 			'.remove-autoload',
@@ -81,7 +82,7 @@ jQuery( document ).ready(
 								.draw( 'page' );
 						},
 						error: function (response) {
-							console.log(response);
+							console.log( response );
 							alert( 'Failed to remove autoload for ' + optionName );
 						}
 					}

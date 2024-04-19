@@ -137,7 +137,7 @@ class REST {
 	 *
 	 * @param \WP_REST_Request $request  The REST request object.
 	 *
-	 * @return \WP_Error|\WP_REST_Response 
+	 * @return \WP_Error|\WP_REST_Response
 	 */
 	public function create_option_false( $request ) {
 		$option_name = $request['option_name'];
