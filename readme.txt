@@ -4,7 +4,7 @@ Tags: options, database, cleanup
 Requires at least: 6.2
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 1.0
+Stable tag: 1.0.1
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -42,6 +42,10 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 1. Screenshot of the admin screen.
 
 == Changelog ==
+
+= 1.0.1 =
+
+Fixed an error with values that are objects, not strings, which also caused sorting not to work for some people.
 
 = 1.0 =
 
