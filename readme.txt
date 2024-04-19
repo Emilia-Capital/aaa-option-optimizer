@@ -4,7 +4,7 @@ Tags: options, database, cleanup
 Requires at least: 6.2
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -42,6 +42,11 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 1. Screenshot of the admin screen.
 
 == Changelog ==
+
+= 1.0.2 =
+
+* Fixed a bug where the buttons wouldn't work in a paginated state.
+* Show the value of an option in a `popover`, as suggested with a great pull request by [@rogierlankhorst](https://profiles.wordpress.org/rogierlankhorst/).
 
 = 1.0.1 =
 
