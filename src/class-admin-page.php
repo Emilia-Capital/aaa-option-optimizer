@@ -34,16 +34,19 @@ class Admin_Page {
 
 	/**
 	 * Enqueue our scripts.
+	 *
+	 * @param string $hook The current page hook.
+	 *
+	 * @return void
 	 */
 	public function enqueue_scripts( $hook ) {
-		error_log($hook);
-		if ( $hook !== 'tools_page_aaa-option-optimizer') {
+		if ( $hook !== 'tools_page_aaa-option-optimizer' ) {
 			return;
 		}
 
 		wp_enqueue_style(
 			'aaa-option-optimizer',
-			plugin_dir_url( AAA_OPTION_OPTIMIZER_FILE ) . 'css/style.min.css',
+			plugin_dir_url( AAA_OPTION_OPTIMIZER_FILE ) . 'css/style.css',
 			[],
 			'2.0.1'
 		);
@@ -223,6 +226,7 @@ class Admin_Page {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '"><td>' . esc_html( $option ) . '</td>';
 				echo '<td>' . esc_html( $this->get_length( $value ) ) . 'KB</td>';
 				echo '<td class="value">';
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output escaped in get_popover_html.
 				echo $this->get_popover_html( $option, $value );
 				echo '</td>';
 				echo '<td><button class="button remove-autoload" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Remove Autoload', 'aaa-option-optimizer' ) . '</button> ';
@@ -254,6 +258,7 @@ class Admin_Page {
 				echo '<td>' . esc_html( $option ) . '</td>';
 				echo '<td>' . esc_html( $this->get_length( $arr['value'] ) ) . 'KB</td>';
 				echo '<td class="value">';
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output escaped in get_popover_html.
 				echo $this->get_popover_html( $option, $arr['value'] );
 				echo '</td>';
 				echo '<td>' . esc_html( $arr['count'] ) . '</td>';
@@ -291,21 +296,21 @@ class Admin_Page {
 	}
 
 	/**
-	 * Get html to show a popover
+	 * Get html to show a popover.
 	 *
-	 * @param string $id
-	 * @param mixed  $value
+	 * @param string $id    The id of the popover.
+	 * @param mixed  $value The value to show.
 	 *
 	 * @return string
 	 */
 	private function get_popover_html( string $id, $value ): string {
-		$string = is_string($value) ? $value : json_encode($value);
-		$id = 'aaa-option-optimizer-' . esc_attr($id);
+		$string = is_string( $value ) ? $value : wp_json_encode( $value );
+		$id     = 'aaa-option-optimizer-' . esc_attr( $id );
 		return '
-		<button class="button" popovertarget="'.$id.'">' . esc_html__( 'Show value', 'aaa-option-optimizer' ) . '</button>
-		<div id="'.$id.'" popover class="aaa-option-optimizer-popover">
+		<button class="button" popovertarget="' . $id . '">' . esc_html__( 'Show value', 'aaa-option-optimizer' ) . '</button>
+		<div id="' . $id . '" popover class="aaa-option-optimizer-popover">
 		  <button class="aaa-option-optimizer-popover__close" popovertarget="' . $id . '" popovertargetaction="hide">X</button>
-		  ' . esc_html( $string ) .'
+		  ' . esc_html( $string ) . '
 		</div>';
 	}
 }
