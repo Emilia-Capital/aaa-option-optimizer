@@ -7,13 +7,13 @@
 jQuery( document ).ready(
 	function ($) {
 		if ( $( '#unused_options_table' ).length ) {
-			var table1 = new DataTable( '#unused_options_table', { responsive: true, columns: [ { width: '30%' }, { searchable: false, width: '10%' }, { searchable: false, width: '20%' }, { searchable: false, width: '20%' } ] } );
+			var table1 = new DataTable( '#unused_options_table', { columns: [ {}, {},{ searchable: false}, { searchable: false}, { searchable: false } ] } );
 		}
 		if ( $( '#used_not_autloaded_table' ).length ) {
-			var table2 = new DataTable( '#used_not_autloaded_table', { columns: [ null, { width: '30%', searchable: false }, { width: '15%', searchable: false }, { width: '15%', searchable: false }, { width: '15%', searchable: false } ] } );
+			var table2 = new DataTable( '#used_not_autloaded_table', { columns: [ null, null, { searchable: false }, { searchable: false }, { searchable: false }, { searchable: false } ] } );
 		}
 		if ( $( '#requested_do_not_exist_table' ).length ) {
-			var table3 = new DataTable( '#requested_do_not_exist_table', { columns: [ null, { searchable: false }, { searchable: false } ] } );
+			var table3 = new DataTable( '#requested_do_not_exist_table', { columns: [ null, null, { searchable: false }, { searchable: false } ] } );
 		}
 
 		// Handle the "Remove Autoload" button click.
@@ -22,7 +22,9 @@ jQuery( document ).ready(
 			'.add-autoload',
 			function (e) {
 				e.preventDefault();
+
 				var optionName = $( this ).data( 'option' );
+				var table      = $( this ).closest( 'table' ).DataTable();
 
 				var requestData = {
 					'autoload': 'yes'
@@ -37,7 +39,10 @@ jQuery( document ).ready(
 						},
 						data: requestData,
 						success: function (response) {
-							$( 'tr#option_' + optionName ).remove();
+							table
+								.row( 'tr#option_' + optionName )
+								.remove()
+								.draw( 'page' );
 						},
 						error: function (response) {
 							alert( 'Failed to add autoload for ' + optionName );
@@ -52,8 +57,9 @@ jQuery( document ).ready(
 			'.remove-autoload',
 			function (e) {
 				e.preventDefault();
-				console.log( 'test remove-autoload' );
+
 				var optionName = $( this ).data( 'option' );
+				var table      = $( this ).closest( 'table' ).DataTable();
 
 				var requestData = {
 					'autoload': 'no'
@@ -68,7 +74,10 @@ jQuery( document ).ready(
 						},
 						data: requestData,
 						success: function (response) {
-							$( 'tr#option_' + optionName ).remove();
+							table
+								.row( 'tr#option_' + optionName )
+								.remove()
+								.draw( 'page' );
 						},
 						error: function (response) {
 							alert( 'Failed to remove autoload for ' + optionName );
@@ -84,7 +93,9 @@ jQuery( document ).ready(
 			'.delete-option',
 			function (e) {
 				e.preventDefault();
+
 				var optionName = $( this ).data( 'option' );
+				var table      = $( this ).closest( 'table' ).DataTable();
 
 				$.ajax(
 					{
@@ -96,7 +107,10 @@ jQuery( document ).ready(
 						success: function (response) {
 							let cleanOptionName = optionName.replace( /\./g, '' ).replace( /\:/g, '' );
 							console.log( 'tr#option_' + cleanOptionName + ' removed.' );
-							$( 'tr#option_' + cleanOptionName ).remove();
+							table
+								.row( 'tr#option_' + optionName )
+								.remove()
+								.draw( 'page' );
 						},
 						error: function (response) {
 							console.log( response );
