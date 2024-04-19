@@ -3,6 +3,14 @@
         "name": "AAA Option Optimizer",
         "option_prefixes": ["option_optimizer"]
     },
+    "advanced-custom-fields": {
+        "name": "Advanced Custom Fields",
+        "option_prefixes": ["acf_"]
+    },
+    "affiliate-wp": {
+        "name": "Affiliate WP",
+        "option_prefixes": ["affwp_"]
+    },
     "burst": {
         "name": "Burst Statistics",
         "option_prefixes": ["burst_"]
@@ -10,6 +18,10 @@
     "complianz": {
         "name": "Complianz GDPR",
         "option_prefixes": ["cmplz_"]
+    },
+    "duplicate-post": {
+        "name": "Yoast Duplicate Post",
+        "option_prefixes": ["duplicate_post_"]
     },
     "easy-digital-downloads": {
         "name": "Easy Digital Downloads",
@@ -19,9 +31,21 @@
         "name": "Elementor",
         "option_prefixes": ["elementor_"]
     },
+    "google-analytics-for-wordpress": {
+        "name": "Google Analytics for WordPress by MonsterInsights",
+        "option_prefixes": ["yst_"]
+    },
+    "gravity-forms": {
+        "name": "Gravity Forms",
+        "option_prefixes": ["gf_"]
+    },
     "really-simple-ssl": {
         "name": "Really Simple SSL",
         "option_prefixes": ["rsssl_"]
+    },
+    "updraft": {
+        "name": "Updraft Plus",
+        "option_prefixes": ["updraft_"]
     },
 	"yoast": {
 		"name": "Yoast SEO",
