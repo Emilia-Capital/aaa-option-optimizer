@@ -4,7 +4,7 @@ Tags: options, database, cleanup
 Requires at least: 6.2
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 1.0
+Stable tag: 1.0.2
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -27,6 +27,12 @@ starting the name with AAA made sense.
 
 Yes!! Backup your database.
 
+= Where can I report bugs? =
+
+Please use [our GitHub](https://github.com/emilia-Capital/aaa-option-optimizer/) for reporting bugs or making code suggestions. Feel free to use the forums for asking questions too, of course.
+
+For security issues, please see the next question.
+
 = How can I report security bugs? =
 
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/aaa-option-optimizer)
@@ -42,6 +48,15 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 1. Screenshot of the admin screen.
 
 == Changelog ==
+
+= 1.0.2 =
+
+* Fixed a bug where the buttons wouldn't work in a paginated state.
+* Show the value of an option in a `popover`, as suggested with a great pull request by [@rogierlankhorst](https://profiles.wordpress.org/rogierlankhorst/).
+
+= 1.0.1 =
+
+Fixed an error with values that are objects, not strings, which also caused sorting not to work for some people.
 
 = 1.0 =
 

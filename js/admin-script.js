@@ -7,18 +7,19 @@
 jQuery( document ).ready(
 	function ($) {
 		if ( $( '#unused_options_table' ).length ) {
-			let table = new DataTable( '#unused_options_table', { responsive: true, columns: [ { width: '20%' }, { width: '20%' },{ searchable: false, width: '10%' }, { searchable: false, width: '50%' }, { searchable: false, width: '20%' } ] } );
+			var table1 = new DataTable( '#unused_options_table', { columns: [ {}, {},{ searchable: false}, { searchable: false}, { searchable: false } ] } );
 		}
 		if ( $( '#used_not_autloaded_table' ).length ) {
-			let table = new DataTable( '#used_not_autloaded_table', { columns: [ null, null, { searchable: false }, { searchable: false }, { searchable: false }, { searchable: false } ] } );
+			var table2 = new DataTable( '#used_not_autloaded_table', { columns: [ null, null, { searchable: false }, { searchable: false }, { searchable: false }, { searchable: false } ] } );
 		}
 		if ( $( '#requested_do_not_exist_table' ).length ) {
-			let table = new DataTable( '#requested_do_not_exist_table', { columns: [ null, null, { searchable: false }, { searchable: false } ] } );
+			var table3 = new DataTable( '#requested_do_not_exist_table', { columns: [ null, null, { searchable: false }, { searchable: false } ] } );
 		}
 
 		// Handle the "Remove Autoload" button click.
-		$( '.add-autoload' ).on(
+		$( 'table tbody' ).on(
 			'click',
+			'.add-autoload',
 			function (e) {
 				e.preventDefault();
 				var optionName = $( this ).data( 'option' );
@@ -46,10 +47,12 @@ jQuery( document ).ready(
 			}
 		);
 
-		$( '.remove-autoload' ).on(
+		$( 'table tbody' ).on(
 			'click',
+			'.remove-autoload',
 			function (e) {
 				e.preventDefault();
+				console.log( 'test remove-autoload' );
 				var optionName = $( this ).data( 'option' );
 
 				var requestData = {
@@ -76,8 +79,9 @@ jQuery( document ).ready(
 		);
 
 		// Handle the "Delete Option" button click.
-		$( '.delete-option' ).on(
+		$( 'table tbody' ).on(
 			'click',
+			'.delete-option',
 			function (e) {
 				e.preventDefault();
 				var optionName = $( this ).data( 'option' );

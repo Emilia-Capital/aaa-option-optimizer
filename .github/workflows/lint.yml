@@ -64,3 +64,6 @@ jobs:
 
       - name: Lint against parse errors
         run: composer lint -- --checkstyle | cs2pr
+
+      - name: Lint blueprint file
+        run: composer lint-blueprint

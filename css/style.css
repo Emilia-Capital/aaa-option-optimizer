@@ -1,0 +1,51 @@
+.aaa_option_table {
+	margin-left: -5px;
+	border-spacing: 0;
+}
+.aaa_option_table td, .aaa_option_table th {
+	padding: 5px 10px 5px 5px;
+	text-align: left;
+	width: 25%;
+}
+.aaa_option_table tr:nth-child(even) {
+	background-color: #fff;
+}
+.aaa_option_table tr:hover {
+	background-color: #ddd;
+}
+div.dt-container .dt-input {
+	padding: 5px 20px 5px 10px !important;
+	max-width: none !important;
+}
+.aaa-option-optimizer-popover {
+	font-family: sans-serif;
+	overflow: visible;
+	padding: 40px 40px 20px 20px;
+	position: fixed;
+	word-wrap: break-word;
+	max-width: 80%;
+	min-height: 200px;
+}
+.aaa-option-optimizer-popover pre {
+	padding: 10px;
+	min-width: 300px;
+	border: 1px solid #ccc;
+	background-color: #eee;
+	overflow: auto;
+}
+.aaa-option-optimizer-popover::backdrop {
+	background: rgba(0, 0, 0, 0.75);
+}
+.aaa-option-optimizer-popover__close {
+	background: none !important;
+	border: none;
+	padding: 5px;
+	margin: 5px;
+	z-index: 10;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+.aaa-option-optimizer-popover__close:hover {
+	cursor: pointer;
+}
