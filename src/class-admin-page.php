@@ -34,8 +34,23 @@ class Admin_Page {
 
 	/**
 	 * Enqueue our scripts.
+	 *
+	 * @param string $hook The current page hook.
+	 *
+	 * @return void
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts( $hook ) {
+		if ( $hook !== 'tools_page_aaa-option-optimizer' ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'aaa-option-optimizer',
+			plugin_dir_url( AAA_OPTION_OPTIMIZER_FILE ) . 'css/style.css',
+			[],
+			'2.0.1'
+		);
+
 		wp_enqueue_script(
 			'datatables',
 			plugin_dir_url( AAA_OPTION_OPTIMIZER_FILE ) . 'js/vendor/dataTables.min.js',
@@ -156,15 +171,6 @@ class Admin_Page {
 		}
 
 		// Start HTML output.
-		echo '<style>
-			.aaa_option_table { margin-left: -5px; border-spacing: 0; }
-			.aaa_option_table td, .aaa_option_table th { padding: 5px 10px 5px 5px; text-align: left; width: 25%; }
-			.aaa_option_table tr:nth-child(even) { background-color: #fff; }
-			.aaa_option_table tr:hover { background-color: #ddd; }
-			.aaa_option_table td.value code { display:block; max-width: 200px; height: 20px; overflow: hidden; }
-			div.dt-container .dt-input { padding: 5px 20px 5px 10px !important; max-width: none !important; }
-
-		</style>';
 		echo '<div class="wrap"><h1>' . esc_html__( 'AAA Option Optimizer', 'aaa-option-optimizer' ) . '</h1>';
 
 		global $wpdb;
@@ -210,7 +216,10 @@ class Admin_Page {
 			foreach ( $unused_options as $option => $value ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '"><td>' . esc_html( $option ) . '</td>';
 				echo '<td>' . esc_html( $this->get_length( $value ) ) . 'KB</td>';
-				echo '<td class="value">' . esc_html( $this->print_value( $value ) ) . '</td>';
+				echo '<td class="value">';
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output escaped in get_popover_html.
+				echo $this->get_popover_html( $option, $value );
+				echo '</td>';
 				echo '<td><button class="button remove-autoload" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Remove Autoload', 'aaa-option-optimizer' ) . '</button> ';
 				echo ' <button class="button delete-option" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Delete Option', 'aaa-option-optimizer' ) . '</button></td></tr>';
 			}
@@ -239,7 +248,10 @@ class Admin_Page {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '">';
 				echo '<td>' . esc_html( $option ) . '</td>';
 				echo '<td>' . esc_html( $this->get_length( $arr['value'] ) ) . 'KB</td>';
-				echo '<td class="value">' . esc_html( $this->print_value( $arr['value'] ) ) . '</td>';
+				echo '<td class="value">';
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output escaped in get_popover_html.
+				echo $this->get_popover_html( $option, $arr['value'] );
+				echo '</td>';
 				echo '<td>' . esc_html( $arr['count'] ) . '</td>';
 				echo '<td><button class="button add-autoload" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Add Autoload', 'aaa-option-optimizer' ) . '</button> ';
 			}
@@ -272,5 +284,26 @@ class Admin_Page {
 		}
 
 		echo '</div>'; // Close .wrap.
+	}
+
+	/**
+	 * Get html to show a popover.
+	 *
+	 * @param string $name  The name of the option, used in the id of the popover.
+	 * @param mixed  $value The value to show.
+	 *
+	 * @return string
+	 */
+	private function get_popover_html( string $name, $value ): string {
+		$string = is_string( $value ) ? $value : wp_json_encode( $value );
+		$id     = 'aaa-option-optimizer-' . esc_attr( $name );
+		return '
+		<button class="button" popovertarget="' . $id . '">' . esc_html__( 'Show value', 'aaa-option-optimizer' ) . '</button>
+		<div id="' . $id . '" popover class="aaa-option-optimizer-popover">
+		<button class="aaa-option-optimizer-popover__close" popovertarget="' . $id . '" popovertargetaction="hide">X</button>' .
+		// translators: %s is the name of the option.
+		'<p><strong>' . sprintf( esc_html__( 'Value of %s', 'aaa-option-optimizer' ), '<code>' . esc_html( $name ) . '</code>' ) . '</strong></p>
+		<pre>' . esc_html( $string ) . '</pre>
+		</div>';
 	}
 }

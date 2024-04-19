@@ -20,7 +20,6 @@
 
 	<!-- Exclude the Coverage output directory. -->
 	<exclude-pattern>/coverage/*</exclude-pattern>
-
 	<exclude-pattern>/js/vendor/*</exclude-pattern>
 
 	<!-- Exclude minified Javascript files. -->

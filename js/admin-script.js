@@ -7,18 +7,20 @@
 jQuery( document ).ready(
 	function ($) {
 		if ( $( '#unused_options_table' ).length ) {
-			var table1 = new DataTable( '#unused_options_table', { responsive: true, columns: [ { width: '20%' }, { searchable: false, width: '10%' }, { searchable: false, width: '50%' }, { searchable: false, width: '20%' } ] } );
+			var table1 = new DataTable( '#unused_options_table', { responsive: true, columns: [ { width: '30%' }, { searchable: false, width: '10%' }, { searchable: false, width: '20%' }, { searchable: false, width: '20%' } ] } );
 		}
 		if ( $( '#used_not_autloaded_table' ).length ) {
-			var table2 = new DataTable( '#used_not_autloaded_table', { columns: [ null, { searchable: false }, { searchable: false }, { searchable: false }, { searchable: false } ] } );
+			var table2 = new DataTable( '#used_not_autloaded_table', { columns: [ null, { width: '30%', searchable: false }, { width: '15%', searchable: false }, { width: '15%', searchable: false }, { width: '15%', searchable: false } ] } );
 		}
 		if ( $( '#requested_do_not_exist_table' ).length ) {
 			var table3 = new DataTable( '#requested_do_not_exist_table', { columns: [ null, { searchable: false }, { searchable: false } ] } );
 		}
 
 		// Handle the "Remove Autoload" button click.
-		$( 'table tbody' ).on( 
-			'click', '.add-autoload', function (e) {
+		$( 'table tbody' ).on(
+			'click',
+			'.add-autoload',
+			function (e) {
 				e.preventDefault();
 				var optionName = $( this ).data( 'option' );
 
@@ -45,8 +47,10 @@ jQuery( document ).ready(
 			}
 		);
 
-		$( 'table tbody' ).on( 
-			'click', '.remove-autoload', function (e) {
+		$( 'table tbody' ).on(
+			'click',
+			'.remove-autoload',
+			function (e) {
 				e.preventDefault();
 				console.log( 'test remove-autoload' );
 				var optionName = $( this ).data( 'option' );
@@ -75,8 +79,10 @@ jQuery( document ).ready(
 		);
 
 		// Handle the "Delete Option" button click.
-		$( 'table tbody' ).on( 
-			'click', '.delete-option', function (e) {
+		$( 'table tbody' ).on(
+			'click',
+			'.delete-option',
+			function (e) {
 				e.preventDefault();
 				var optionName = $( this ).data( 'option' );
 
