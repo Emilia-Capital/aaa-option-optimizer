@@ -207,7 +207,7 @@ class Admin_Page {
 			echo '<thead>';
 			echo '<tr>';
 			echo '<th>' . esc_html__( 'Option', 'aaa-option-optimizer' ) . '</th>';
-			echo '<th>' . esc_html__( 'Size', 'aaa-option-optimizer' ) . '</th>';
+			echo '<th>' . esc_html__( 'Size (Kb)', 'aaa-option-optimizer' ) . '</th>';
 			echo '<th>' . esc_html__( 'Value', 'aaa-option-optimizer' ) . '</th>';
 			echo '<th>' . esc_html__( 'Actions', 'aaa-option-optimizer' ) . '</th>';
 			echo '</tr>';
@@ -215,7 +215,7 @@ class Admin_Page {
 			echo '<tbody>';
 			foreach ( $unused_options as $option => $value ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '"><td>' . esc_html( $option ) . '</td>';
-				echo '<td>' . esc_html( $this->get_length( $value ) ) . 'KB</td>';
+				echo '<td>' . esc_html( $this->get_length( $value ) ) . '</td>';
 				echo '<td class="value">';
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output escaped in get_popover_html.
 				echo $this->get_popover_html( $option, $value );
@@ -237,7 +237,7 @@ class Admin_Page {
 			echo '<thead>';
 			echo '<tr>';
 			echo '<th>' . esc_html__( 'Option', 'aaa-option-optimizer' ) . '</th>';
-			echo '<th>' . esc_html__( 'Size', 'aaa-option-optimizer' ) . '</th>';
+			echo '<th>' . esc_html__( 'Size (Kb)', 'aaa-option-optimizer' ) . '</th>';
 			echo '<th>' . esc_html__( 'Value', 'aaa-option-optimizer' ) . '</th>';
 			echo '<th>' . esc_html__( '# Calls', 'aaa-option-optimizer' ) . '</th>';
 			echo '<th>' . esc_html__( 'Actions', 'aaa-option-optimizer' ) . '</th>';
@@ -247,7 +247,7 @@ class Admin_Page {
 			foreach ( $non_autoloaded_options_full as $option => $arr ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '">';
 				echo '<td>' . esc_html( $option ) . '</td>';
-				echo '<td>' . esc_html( $this->get_length( $arr['value'] ) ) . 'KB</td>';
+				echo '<td>' . esc_html( $this->get_length( $arr['value'] ) ) . '</td>';
 				echo '<td class="value">';
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output escaped in get_popover_html.
 				echo $this->get_popover_html( $option, $arr['value'] );
