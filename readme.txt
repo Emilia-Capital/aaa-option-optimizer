@@ -4,7 +4,7 @@ Tags: options, database, cleanup
 Requires at least: 6.2
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 1.1
+Stable tag: 1.1.1
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -48,6 +48,10 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 1. Screenshot of the admin screen.
 
 == Changelog ==
+
+= 1.1.1 =
+
+Implement the missing functionality to create an option with value `false` when it's being loaded but doesn't exist.
 
 = 1.1 =
 
