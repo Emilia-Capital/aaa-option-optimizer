@@ -5,7 +5,6 @@
 .aaa_option_table td, .aaa_option_table th {
 	padding: 5px 10px 5px 5px;
 	text-align: left;
-	width: 25%;
 }
 .aaa_option_table tr:nth-child(even) {
 	background-color: #fff;

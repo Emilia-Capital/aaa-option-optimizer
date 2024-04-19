@@ -23,6 +23,10 @@
         "name": "Really Simple SSL",
         "option_prefixes": ["rsssl_"]
     },
+	"yoast": {
+		"name": "Yoast SEO",
+		"option_prefixes": ["wpseo_", "yoast_"]
+	},
     "woocommerce": {
         "name": "WooCommerce",
         "option_prefixes": ["wc_", "_transient__woocommerce_"]
