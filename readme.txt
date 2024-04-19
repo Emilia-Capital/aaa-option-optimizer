@@ -4,7 +4,7 @@ Tags: options, database, cleanup
 Requires at least: 6.2
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.1
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -48,6 +48,20 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 1. Screenshot of the admin screen.
 
 == Changelog ==
+
+= 1.1 =
+
+The plugin now recognizes plugins from which the options came (thanks to a great pull by [@rogierlankhorst](https://profiles.wordpress.org/rogierlankhorst/)). If you're a plugin developer and want your plugin's options 
+properly recognized, please do a pull request [on this file](https://github.com/Emilia-Capital/aaa-option-optimizer/blob/main/known-plugins/known-plugins.json).
+
+Small enhancements:
+* Column width is now automatically determined which leads to better spacing.
+* Action buttons are now centered in their columns.
+
+Bugs fixed:
+* If you removed autoload from or deleted an option, it'd be removed from the table but would be back when you paginated, that's fixed (thanks to [Jono Alderson](https://profiles.wordpress.org/jonoaldersonwp/)) for reporting.
+* Fixed sorting by filesize by moving the `KB` to the table heading, so that you can now properly sort numbers.
+* Fixed issue where an empty option would result in weird size output.
 
 = 1.0.2 =
 

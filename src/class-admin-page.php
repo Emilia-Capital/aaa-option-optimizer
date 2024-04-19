@@ -325,7 +325,7 @@ class Admin_Page {
 			}
 		}
 
-		return __( 'Unknown plugin', 'aaa-option-optimizer' );
+		return __( 'Unknown', 'aaa-option-optimizer' );
 	}
 
 	/**
