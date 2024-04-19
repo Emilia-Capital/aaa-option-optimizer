@@ -51,15 +51,17 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 1.1 =
 
-The plugin now recognizes plugins from which the options came (thanks to a great pull by [@rogierlankhorst](https://profiles.wordpress.org/rogierlankhorst/)). If you're a plugin developer and want your plugin's options 
+The plugin now recognizes plugins from which the options came (thanks to a great pull by [Rogier Lankhorst](https://profiles.wordpress.org/rogierlankhorst/)). If you're a plugin developer and want your plugin's options 
 properly recognized, please do a pull request [on this file](https://github.com/Emilia-Capital/aaa-option-optimizer/blob/main/known-plugins/known-plugins.json).
 
 Small enhancements:
+
 * Column width is now automatically determined which leads to better spacing.
 * Action buttons are now centered in their columns.
 
 Bugs fixed:
-* If you removed autoload from or deleted an option, it'd be removed from the table but would be back when you paginated, that's fixed (thanks to [Jono Alderson](https://profiles.wordpress.org/jonoaldersonwp/)) for reporting.
+
+* If you removed autoload from or deleted an option, it'd be removed from the table but would be back when you paginated, that's fixed - thanks to [Jono Alderson](https://profiles.wordpress.org/jonoaldersonwp/) for reporting.
 * Fixed sorting by filesize by moving the `KB` to the table heading, so that you can now properly sort numbers.
 * Fixed issue where an empty option would result in weird size output.
 
