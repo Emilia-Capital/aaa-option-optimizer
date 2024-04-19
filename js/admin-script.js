@@ -22,7 +22,9 @@ jQuery( document ).ready(
 			'.add-autoload',
 			function (e) {
 				e.preventDefault();
+
 				var optionName = $( this ).data( 'option' );
+				var table      = $( this ).closest( 'table' ).DataTable();
 
 				var requestData = {
 					'autoload': 'yes'
@@ -37,7 +39,10 @@ jQuery( document ).ready(
 						},
 						data: requestData,
 						success: function (response) {
-							$( 'tr#option_' + optionName ).remove();
+							table
+								.row( 'tr#option_' + optionName )
+								.remove()
+								.draw( 'page' );
 						},
 						error: function (response) {
 							alert( 'Failed to add autoload for ' + optionName );
@@ -52,8 +57,9 @@ jQuery( document ).ready(
 			'.remove-autoload',
 			function (e) {
 				e.preventDefault();
-				console.log( 'test remove-autoload' );
+
 				var optionName = $( this ).data( 'option' );
+				var table      = $( this ).closest( 'table' ).DataTable();
 
 				var requestData = {
 					'autoload': 'no'
@@ -68,7 +74,10 @@ jQuery( document ).ready(
 						},
 						data: requestData,
 						success: function (response) {
-							$( 'tr#option_' + optionName ).remove();
+							table
+								.row( 'tr#option_' + optionName )
+								.remove()
+								.draw( 'page' );
 						},
 						error: function (response) {
 							alert( 'Failed to remove autoload for ' + optionName );
@@ -84,7 +93,9 @@ jQuery( document ).ready(
 			'.delete-option',
 			function (e) {
 				e.preventDefault();
+
 				var optionName = $( this ).data( 'option' );
+				var table      = $( this ).closest( 'table' ).DataTable();
 
 				$.ajax(
 					{
@@ -96,7 +107,10 @@ jQuery( document ).ready(
 						success: function (response) {
 							let cleanOptionName = optionName.replace( /\./g, '' ).replace( /\:/g, '' );
 							console.log( 'tr#option_' + cleanOptionName + ' removed.' );
-							$( 'tr#option_' + cleanOptionName ).remove();
+							table
+								.row( 'tr#option_' + optionName )
+								.remove()
+								.draw( 'page' );
 						},
 						error: function (response) {
 							console.log( response );
