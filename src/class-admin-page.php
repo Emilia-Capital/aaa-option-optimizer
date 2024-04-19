@@ -171,15 +171,6 @@ class Admin_Page {
 		}
 
 		// Start HTML output.
-		echo '<style>
-			.aaa_option_table { margin-left: -5px; border-spacing: 0; }
-			.aaa_option_table td, .aaa_option_table th { padding: 5px 10px 5px 5px; text-align: left; width: 25%; }
-			.aaa_option_table tr:nth-child(even) { background-color: #fff; }
-			.aaa_option_table tr:hover { background-color: #ddd; }
-			.aaa_option_table td.value code { display:block; max-width: 200px; height: 20px; overflow: hidden; }
-			div.dt-container .dt-input { padding: 5px 20px 5px 10px !important; max-width: none !important; }
-
-		</style>';
 		echo '<div class="wrap"><h1>' . esc_html__( 'AAA Option Optimizer', 'aaa-option-optimizer' ) . '</h1>';
 
 		global $wpdb;
@@ -298,19 +289,21 @@ class Admin_Page {
 	/**
 	 * Get html to show a popover.
 	 *
-	 * @param string $id    The id of the popover.
+	 * @param string $name  The name of the option, used in the id of the popover.
 	 * @param mixed  $value The value to show.
 	 *
 	 * @return string
 	 */
-	private function get_popover_html( string $id, $value ): string {
+	private function get_popover_html( string $name, $value ): string {
 		$string = is_string( $value ) ? $value : wp_json_encode( $value );
-		$id     = 'aaa-option-optimizer-' . esc_attr( $id );
+		$id     = 'aaa-option-optimizer-' . esc_attr( $name );
 		return '
 		<button class="button" popovertarget="' . $id . '">' . esc_html__( 'Show value', 'aaa-option-optimizer' ) . '</button>
 		<div id="' . $id . '" popover class="aaa-option-optimizer-popover">
-		  <button class="aaa-option-optimizer-popover__close" popovertarget="' . $id . '" popovertargetaction="hide">X</button>
-		  ' . esc_html( $string ) . '
+		<button class="aaa-option-optimizer-popover__close" popovertarget="' . $id . '" popovertargetaction="hide">X</button>' .
+		// translators: %s is the name of the option.
+		'<p><strong>' . sprintf( esc_html__( 'Value of %s', 'aaa-option-optimizer' ), '<code>' . esc_html( $name ) . '</code>' ) . '</strong></p>
+		<pre>' . esc_html( $string ) . '</pre>
 		</div>';
 	}
 }
