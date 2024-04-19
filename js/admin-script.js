@@ -45,6 +45,7 @@ jQuery( document ).ready(
 								.draw( 'page' );
 						},
 						error: function (response) {
+							console.log(response);
 							alert( 'Failed to add autoload for ' + optionName );
 						}
 					}
@@ -80,6 +81,7 @@ jQuery( document ).ready(
 								.draw( 'page' );
 						},
 						error: function (response) {
+							console.log(response);
 							alert( 'Failed to remove autoload for ' + optionName );
 						}
 					}
@@ -106,7 +108,6 @@ jQuery( document ).ready(
 						},
 						success: function (response) {
 							let cleanOptionName = optionName.replace( /\./g, '' ).replace( /\:/g, '' );
-							console.log( 'tr#option_' + cleanOptionName + ' removed.' );
 							table
 								.row( 'tr#option_' + optionName )
 								.remove()
@@ -115,6 +116,39 @@ jQuery( document ).ready(
 						error: function (response) {
 							console.log( response );
 							alert( 'Failed to delete option ' + optionName );
+						}
+					}
+				);
+			}
+		);
+
+		// Handle the "Create Option with value 'false'" button click.
+		$( 'table tbody' ).on(
+			'click',
+			'.create-option-false',
+			function (e) {
+				e.preventDefault();
+
+				var optionName = $( this ).data( 'option' );
+				var table      = $( this ).closest( 'table' ).DataTable();
+
+				$.ajax(
+					{
+						url: aaaOptionOptimizer.root + 'aaa-option-optimizer/v1/create-option-false/' + optionName,
+						method: 'POST',
+						beforeSend: function (xhr) {
+							xhr.setRequestHeader( 'X-WP-Nonce', aaaOptionOptimizer.nonce );
+						},
+						success: function (response) {
+							let cleanOptionName = optionName.replace( /\./g, '' ).replace( /\:/g, '' );
+							table
+								.row( 'tr#option_' + optionName )
+								.remove()
+								.draw( 'page' );
+						},
+						error: function (response) {
+							console.log( response );
+							alert( 'Failed to create option ' + optionName );
 						}
 					}
 				);

@@ -294,7 +294,7 @@ class Admin_Page {
 				echo '<td>' . esc_html( $option ) . '</td>';
 				echo '<td>' . esc_html( $this->get_plugin_name( $option ) ) . '</td>';
 				echo '<td>' . esc_html( $count ) . '</td>';
-				echo '<td class="actions"><button class="button add-autoload" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Create Option with value false', 'aaa-option-optimizer' ) . '</button> ';
+				echo '<td class="actions"><button class="button create-option-false" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Create Option with value false', 'aaa-option-optimizer' ) . '</button> ';
 			}
 			echo '</tbody>';
 			echo '</table>';

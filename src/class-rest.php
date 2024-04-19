@@ -68,6 +68,24 @@ class REST {
 				],
 			]
 		);
+
+		\register_rest_route(
+			'aaa-option-optimizer/v1',
+			'/create-option-false/(?P<option_name>[a-zA-Z0-9-_\.\:]+)',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'create_option_false' ],
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+				'args'                => [
+					'option_name' => [
+						'required'          => true,
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+				],
+			]
+		);
 	}
 
 	/**
@@ -110,8 +128,22 @@ class REST {
 		$option_name = $request['option_name'];
 		if ( delete_option( $option_name ) ) {
 			return new \WP_REST_Response( [ 'success' => true ], 200 );
-		} else {
-			return new \WP_Error( 'option_not_found_or_deleted', 'Option does not exist or could not be deleted', [ 'status' => 404 ] );
 		}
+		return new \WP_Error( 'option_not_found_or_deleted', 'Option does not exist or could not be deleted', [ 'status' => 404 ] );
+	}
+
+	/**
+	 * Create an option with a false value.
+	 *
+	 * @param \WP_REST_Request $request  The REST request object.
+	 *
+	 * @return \WP_Error|\WP_REST_Response 
+	 */
+	public function create_option_false( $request ) {
+		$option_name = $request['option_name'];
+		if ( add_option( $option_name, false, '', 'no' ) ) {
+			return new \WP_REST_Response( [ 'success' => true ], 200 );
+		}
+		return new \WP_Error( 'option_not_created', 'Option could not be created', [ 'status' => 400 ] );
 	}
 }
