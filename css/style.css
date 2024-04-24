@@ -6,17 +6,33 @@
 	padding: 5px 10px 5px 5px;
 	text-align: left;
 }
-.aaa_option_table td.actions {
+.aaa_option_table .actions {
 	text-align: center;
+}
+.aaa_option_table .actions .button {
+	margin-right: 20px;
+	width: 150px;
+}
+.aaa_option_table .actions .button-delete {
+	margin-right: 0;
+	color: #a00;
+	border-color: #a00;
+}
+.aaa_option_table .actions .button span.dashicons, .aaa_option_table .button.dashicon span.dashicons {
+	padding: 3px 0;
+	margin: 0;
 }
 .aaa_option_table td span.num {
 	font-family: monospace;
 }
 .aaa_option_table tr:nth-child(even) {
+	background-color: #eee;
+}
+.aaa_option_table tr:nth-child(odd) {
 	background-color: #fff;
 }
 .aaa_option_table tr:hover {
-	background-color: #ddd;
+	background-color: #ddd !important;
 }
 div.dt-container .dt-input {
 	padding: 5px 20px 5px 10px !important;
@@ -54,3 +70,57 @@ div.dt-container .dt-input {
 .aaa-option-optimizer-popover__close:hover {
 	cursor: pointer;
 }
+
+.aaa-option-optimizer-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	max-width: 100%;
+	background: #e5e5e5;
+	box-shadow: 0 48px 80px -32px rgba(0,0,0,0.3);
+	}
+	.aaa-option-optimizer-tabs .input {
+	position: absolute;
+	opacity: 0;
+	}
+	.aaa-option-optimizer-tabs .label {
+	width: 100%;
+	padding: 20px 30px;
+	background: #e5e5e5;
+	cursor: pointer;
+	font-weight: bold;
+	font-size: 18px;
+	color: #7f7f7f;
+	transition: background 0.1s, color 0.1s;
+	}
+	.aaa-option-optimizer-tabs .label:hover {
+	background: #d8d8d8;
+	}
+	.aaa-option-optimizer-tabs .label:active {
+	background: #ccc;
+	}
+	.aaa-option-optimizer-tabs .input:focus + .label {
+	z-index: 1;
+	}
+	.aaa-option-optimizer-tabs .input:checked + .label {
+	background: #fff;
+	color: #000;
+	}
+	@media (min-width: 600px) {
+	.aaa-option-optimizer-tabs .label {
+		width: auto;
+	}
+	}
+	.aaa-option-optimizer-tabs .panel {
+	display: none;
+	padding: 20px 30px 30px;
+	background: #fff;
+	}
+	@media (min-width: 600px) {
+	.aaa-option-optimizer-tabs .panel {
+		order: 99;
+	}
+	}
+	.aaa-option-optimizer-tabs .input:checked + .label + .panel {
+	display: block;
+	width: 100%;
+	}

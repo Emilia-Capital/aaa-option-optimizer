@@ -17,9 +17,20 @@ use WP_REST_Response;
 class REST {
 
 	/**
+	 * The map plugin to options class.
+	 *
+	 * @var Map_Plugin_To_Options
+	 */
+	private $map_plugin_to_options;
+
+	/**
 	 * Registers hooks.
+	 *
+	 * @return void
 	 */
 	public function register_hooks() {
+		$this->map_plugin_to_options = new Map_Plugin_To_Options();
+
 		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
 	}
 
@@ -86,6 +97,41 @@ class REST {
 				],
 			]
 		);
+
+		\register_rest_route(
+			'aaa-option-optimizer/v1',
+			'/all-options/',
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'get_all_options' ],
+				'permission_callback' => function () {
+					return true;
+				},
+			]
+		);
+	}
+
+	/**
+	 * Update autoload status of an option.
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function get_all_options() {
+		global $wpdb;
+
+		$output  = [];
+		$options = $wpdb->get_results( "SELECT option_name, option_value, autoload FROM $wpdb->options" );
+		foreach ( $options as $option ) {
+			$output[] = [
+				'name'     => $option->option_name,
+				'plugin'   => $this->map_plugin_to_options->get_plugin_name( $option->option_name ),
+				'value'    => $option->option_value,
+				'size'     => number_format( strlen( $option->option_value ) / 1024, 2 ),
+				'autoload' => $option->autoload,
+				'row_id'   => 'option_' . $option->option_name,
+			];
+		}
+		return new \WP_REST_Response( [ 'data' => $output ], 200 );
 	}
 
 	/**

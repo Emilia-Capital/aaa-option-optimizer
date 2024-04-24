@@ -14,12 +14,14 @@ class Plugin {
 	/**
 	 * Holds the names of the options accessed during the request.
 	 *
-	 * @var array
+	 * @var string[]
 	 */
 	protected $accessed_options = [];
 
 	/**
 	 * Registers hooks.
+	 *
+	 * @return void
 	 */
 	public function register_hooks() {
 		$this->accessed_options = get_option( 'option_optimizer', [ 'used_options' => [] ] )['used_options'];
@@ -30,6 +32,7 @@ class Plugin {
 		// Use the shutdown action to update the option with tracked data.
 		add_action( 'shutdown', [ $this, 'update_tracked_options' ] );
 
+		require_once plugin_dir_path( AAA_OPTION_OPTIMIZER_FILE ) . 'src/class-map-plugin-to-options.php';
 		require_once plugin_dir_path( AAA_OPTION_OPTIMIZER_FILE ) . 'src/class-rest.php';
 		// Register the REST routes.
 		$rest = new REST();
@@ -48,6 +51,8 @@ class Plugin {
 	 * Monitor all actions and filters for option accesses.
 	 *
 	 * @param string $tag The current action or filter tag being executed.
+	 *
+	 * @return void
 	 */
 	public function monitor_option_accesses( $tag ) {
 		// Check if the tag is related to an option access.
@@ -61,6 +66,8 @@ class Plugin {
 	 * Add an option to the list of used options if it's not already there.
 	 *
 	 * @param string $option_name Name of the option being accessed.
+	 *
+	 * @return void
 	 */
 	protected function add_option_usage( $option_name ) {
 		// Check if this option hasn't been tracked yet and add it to the array.
@@ -73,6 +80,8 @@ class Plugin {
 
 	/**
 	 * Update the 'option_optimizer' option with the list of used options at the end of the page load.
+	 *
+	 * @return void
 	 */
 	public function update_tracked_options() {
 		// phpcs:ignore WordPress.Security.NonceVerification -- not doing anything.
