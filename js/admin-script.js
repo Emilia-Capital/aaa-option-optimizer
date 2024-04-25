@@ -187,7 +187,7 @@ jQuery( document ).ready(
 										console.log( this.name );
 
 										// Create select element.
-										let select            = document.createElement( 'select' );
+										let select = document.createElement( 'select' );
 										select.add( new Option( 'All sources', '',true,true ) );
 										column.footer().replaceChildren( select );
 
