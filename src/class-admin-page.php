@@ -99,6 +99,43 @@ class Admin_Page {
 	}
 
 	/**
+	 * Render a table section.
+	 *
+	 * @param string   $section The section (usually thead or tfoot).
+	 * @param string[] $columns The columns to render.
+	 *
+	 * @return void
+	 */
+	public function table_section( $section, $columns ) {
+		echo '<' . esc_html( $section ) . '>';
+		echo '<tr>';
+		foreach ( $columns as $column ) {
+			switch ( $column ) {
+				case 'actions':
+					echo '<th class="actions">' . esc_html__( 'Actions', 'aaa-option-optimizer' ) . '</th>';
+					break;
+				case 'autoload':
+					echo '<th>' . esc_html__( 'Autoload', 'aaa-option-optimizer' ) . '</th>';
+					break;
+				case 'calls':
+					echo '<th>' . esc_html__( '# Calls', 'aaa-option-optimizer' ) . '</th>';
+					break;
+				case 'option':
+					echo '<th>' . esc_html__( 'Option', 'aaa-option-optimizer' ) . '</th>';
+					break;
+				case 'size':
+					echo '<th>' . esc_html__( 'Size (in KB)', 'aaa-option-optimizer' ) . '</th>';
+					break;
+				case 'source':
+					echo '<th>' . esc_html__( 'Source', 'aaa-option-optimizer' ) . '</th>';
+					break;
+			}
+		}
+		echo '</tr>';
+		echo '</' . esc_html( $section ) . '>';
+	}
+
+	/**
 	 * Get the length of a value.
 	 *
 	 * @param mixed $value The input value.
@@ -220,14 +257,7 @@ class Admin_Page {
 		if ( ! empty( $unused_options ) ) {
 			echo '<p>' . esc_html__( 'The following options are autoloaded on each pageload, but AAA Option Optimizer has not been able to detect them being used.', 'aaa-option-optimizer' );
 			echo '<table style="width:100%" id="unused_options_table" class="aaa_option_table">';
-			echo '<thead>';
-			echo '<tr>';
-			echo '<th>' . esc_html__( 'Option', 'aaa-option-optimizer' ) . '</th>';
-			echo '<th>' . esc_html__( 'Plugin/Theme', 'aaa-option-optimizer' ) . '</th>';
-			echo '<th>' . esc_html__( 'Size (in KB)', 'aaa-option-optimizer' ) . '</th>';
-			echo '<th class="actions">' . esc_html__( 'Actions', 'aaa-option-optimizer' ) . '</th>';
-			echo '</tr>';
-			echo '</thead>';
+			$this->table_section( 'thead', [ 'option', 'source', 'size', 'actions' ] );
 			echo '<tbody>';
 			foreach ( $unused_options as $option => $value ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '"><td>' . esc_html( $option ) . '</td>';
@@ -241,6 +271,7 @@ class Admin_Page {
 				echo '</td></tr>';
 			}
 			echo '</tbody>';
+			$this->table_section( 'tfoot', [ 'option', 'source', 'size', 'actions' ] );
 			echo '</table>';
 		} else {
 			echo '<p>' . esc_html__( 'All autoloaded options are in use.', 'aaa-option-optimizer' ) . '</p>';
@@ -256,15 +287,7 @@ class Admin_Page {
 			echo '<h2 id="used-not-autoloaded">' . esc_html__( 'Used, but not autoloaded options', 'aaa-option-optimizer' ) . '</h2>';
 			echo '<p>' . esc_html__( 'The following options are *not* autoloaded on each pageload, but AAA Option Optimizer has detected that they are being used. If one of the options below has been called a lot and is not very big, you might consider adding autoload to that option.', 'aaa-option-optimizer' );
 			echo '<table style="width:100%;" id="used_not_autloaded_table" class="aaa_option_table">';
-			echo '<thead>';
-			echo '<tr>';
-			echo '<th>' . esc_html__( 'Option', 'aaa-option-optimizer' ) . '</th>';
-			echo '<th>' . esc_html__( 'Plugin/Theme', 'aaa-option-optimizer' ) . '</th>';
-			echo '<th>' . esc_html__( 'Size (in KB)', 'aaa-option-optimizer' ) . '</th>';
-			echo '<th>' . esc_html__( '# Calls', 'aaa-option-optimizer' ) . '</th>';
-			echo '<th class="actions">' . esc_html__( 'Actions', 'aaa-option-optimizer' ) . '</th>';
-			echo '</tr>';
-			echo '</thead>';
+			$this->table_section( 'thead', [ 'option', 'source', 'size', 'calls', 'actions' ] );
 			echo '<tbody>';
 			foreach ( $non_autoloaded_options_full as $option => $arr ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '">';
@@ -279,6 +302,7 @@ class Admin_Page {
 				echo '</td></tr>';
 			}
 			echo '</tbody>';
+			$this->table_section( 'tfoot', [ 'option', 'source', 'size', 'calls', 'actions' ] );
 			echo '</table>';
 		} else {
 			echo '<p>' . esc_html__( 'All options that are used are autoloaded.', 'aaa-option-optimizer' ) . '</p>';
@@ -293,14 +317,7 @@ class Admin_Page {
 			echo '<h2 id="requested-do-not-exist">' . esc_html__( 'Requested options that do not exist', 'aaa-option-optimizer' ) . '</h2>';
 			echo '<p>' . esc_html__( 'The following options are requested sometimes, but AAA Option Optimizer has detected that they do not exist. If one of the options below has been called a lot, it might help to create it with a value of false.', 'aaa-option-optimizer' );
 			echo '<table width="100%" id="requested_do_not_exist_table" class="aaa_option_table">';
-			echo '<thead>';
-			echo '<tr>';
-			echo '<th>' . esc_html__( 'Option', 'aaa-option-optimizer' ) . '</th>';
-			echo '<th>' . esc_html__( 'Plugin/Theme', 'aaa-option-optimizer' ) . '</th>';
-			echo '<th>' . esc_html__( '# Calls', 'aaa-option-optimizer' ) . '</th>';
-			echo '<th class="actions">' . esc_html__( 'Actions', 'aaa-option-optimizer' ) . '</th>';
-			echo '</tr>';
-			echo '</thead>';
+			$this->table_section( 'thead', [ 'option', 'source', 'calls', 'actions' ] );
 			echo '<tbody>';
 			foreach ( $options_that_do_not_exist as $option => $count ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '">';
@@ -310,6 +327,7 @@ class Admin_Page {
 				echo '<td class="actions"><button class="button button-primary create-option-false" data-option="' . esc_attr( $option ) . '">' . esc_html__( 'Create option with value false', 'aaa-option-optimizer' ) . '</button> ';
 			}
 			echo '</tbody>';
+			$this->table_section( 'tfoot', [ 'option', 'source', 'calls', 'actions' ] );
 			echo '</table>';
 		}
 		?>
@@ -319,15 +337,7 @@ class Admin_Page {
 		<div class="panel">
 			<button id="aaa_get_all_options" class="button button-primary"><?php esc_html_e( 'Get all options', 'aaa-option-optimizer' ); ?></button>
 			<table class="aaa_option_table" id="all_options_table" style="display:none;">
-				<thead>
-					<tr>
-						<th>Name</th>
-						<?php echo '<th>' . esc_html__( 'Plugin/Theme', 'aaa-option-optimizer' ) . '</th>'; ?>
-						<th>Size (in KB)</th>
-						<th>Autoload</th>
-						<th>Actions</th>
-					</tr>
-				</thead>
+				<?php $this->table_section( 'thead', [ 'option', 'source', 'size', 'autoload', 'actions' ] ); ?>
 				<tbody>
 					<tr>
 						<td></td>
@@ -337,6 +347,7 @@ class Admin_Page {
 						<td class="actions"></td>
 					</tr>	
 				</tbody>
+				<?php $this->table_section( 'tfoot', [ 'option', 'source', 'size', 'autoload', 'actions' ] ); ?>
 			</table>
 		</div>
 	</div>

@@ -7,13 +7,124 @@
 jQuery( document ).ready(
 	function ($) {
 		if ( $( '#unused_options_table' ).length ) {
-			var table1 = new DataTable( '#unused_options_table', { pageLength: 25, columns: [ null, null, { searchable: false}, { searchable: false, orderable: false} ] } );
+			var table1 = new DataTable(
+				'#unused_options_table',
+				{
+					pageLength: 25,
+					columns: [
+						{ name: 'name' },
+						{ name: 'source' },
+						{ searchable: false},
+						{ searchable: false, orderable: false}
+					],
+					initComplete: function () {
+						this.api()
+							.columns( 'source:name' )
+							.every(
+								function () {
+									let column = this;
+									console.log( this.name );
+
+									let select            = document.createElement( 'select' );
+									select.placeholder    = 'Filter by source';
+									filterOption          = new Option( 'Filter by source', '',true,true );
+									filterOption.disabled = true;
+									select.add( filterOption );
+									column.footer().replaceChildren( select );
+
+									// Apply listener for user change in value.
+									select.addEventListener(
+										'change',
+										function () {
+											column
+											.search( select.value, {exact: true} )
+											.draw();
+										}
+									);
+
+									// Add list of options.
+									column
+									.data()
+									.unique()
+									.sort()
+									.each(
+										function (d, j) {
+											select.add( new Option( d ) );
+										}
+									);
+								}
+							);
+					}
+				}
+			);
 		}
 		if ( $( '#used_not_autloaded_table' ).length ) {
-			var table2 = new DataTable( '#used_not_autloaded_table', { pageLength: 25, columns: [ null, null, { searchable: false }, { searchable: false }, { searchable: false, orderable: false } ] } );
+			var table2 = new DataTable(
+				'#used_not_autloaded_table',
+				{
+					pageLength: 25,
+					columns: [
+						{ name: 'name' },
+						{ name: 'source' },
+						{ searchable: false },
+						{ searchable: false },
+						{ searchable: false, orderable: false }
+					],
+					initComplete: function () {
+						this.api()
+							.columns( 'source:name' )
+							.every(
+								function () {
+									let column = this;
+									console.log( this.name );
+
+									// Create select element.
+									let select            = document.createElement( 'select' );
+									select.placeholder    = 'Filter by source';
+									filterOption          = new Option( 'Filter by source', '',true,true );
+									filterOption.disabled = true;
+									select.add( filterOption );
+									column.footer().replaceChildren( select );
+
+									// Apply listener for user change in value.
+									select.addEventListener(
+										'change',
+										function () {
+											column
+											.search( select.value, {exact: true} )
+											.draw();
+										}
+									);
+
+									// Add list of options.
+									column
+									.data()
+									.unique()
+									.sort()
+									.each(
+										function (d, j) {
+											select.add( new Option( d ) );
+										}
+									);
+								}
+							);
+					}
+				}
+			);
 		}
 		if ( $( '#requested_do_not_exist_table' ).length ) {
-			var table3 = new DataTable( '#requested_do_not_exist_table', { pageLength: 25, columns: [ null, null, { searchable: false }, { searchable: false, orderable: false } ] } );
+			var table3 = new DataTable(
+				'#requested_do_not_exist_table',
+				{
+					pageLength: 25,
+					columns: [
+						null,
+						null,
+						{ searchable: false },
+						{ searchable: false, orderable: false }
+					]
+				}
+			);
 		}
 
 		$( '#aaa_get_all_options' ).on(
@@ -33,7 +144,7 @@ jQuery( document ).ready(
 						rowId: 'row_id',
 						columns: [
 							{ data: 'name' },
-							{ data: 'plugin' },
+							{ name: 'source', data: 'plugin' },
 							{
 								data: 'size',
 								render: function (data, type, row, meta) {
@@ -65,7 +176,46 @@ jQuery( document ).ready(
 								orderable: false,
 								className: 'actions',
 						},
-						]
+						],
+						initComplete: function () {
+							this.api()
+								.columns( 'source:name' )
+								.every(
+									function () {
+										let column = this;
+										console.log( this.name );
+
+										// Create select element.
+										let select            = document.createElement( 'select' );
+										select.placeholder    = 'Filter by source';
+										filterOption          = new Option( 'Filter by source', '',true,true );
+										filterOption.disabled = true;
+										select.add( filterOption );
+										column.footer().replaceChildren( select );
+
+										// Apply listener for user change in value.
+										select.addEventListener(
+											'change',
+											function () {
+												column
+												.search( select.value, {exact: true} )
+												.draw();
+											}
+										);
+
+										// Add list of options.
+										column
+										.data()
+										.unique()
+										.sort()
+										.each(
+											function (d, j) {
+												select.add( new Option( d ) );
+											}
+										);
+									}
+								);
+						}
 					}
 				);
 				$( this ).hide();

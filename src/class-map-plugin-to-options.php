@@ -7,6 +7,11 @@
 
 namespace Emilia\OptionOptimizer;
 
+/**
+ * Class Map_Plugin_To_Options
+ *
+ * @package Emilia\OptionOptimizer
+ */
 class Map_Plugin_To_Options {
 	/**
 	 * List of plugins we can recognize.

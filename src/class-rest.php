@@ -119,7 +119,8 @@ class REST {
 	public function get_all_options() {
 		global $wpdb;
 
-		$output  = [];
+		$output = [];
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- We need to query all options.
 		$options = $wpdb->get_results( "SELECT option_name, option_value, autoload FROM $wpdb->options" );
 		foreach ( $options as $option ) {
 			$output[] = [
