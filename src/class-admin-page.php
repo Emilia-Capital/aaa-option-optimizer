@@ -159,21 +159,6 @@ class Admin_Page {
 	}
 
 	/**
-	 * Print a value.
-	 *
-	 * @param mixed $value The input value.
-	 *
-	 * @return string
-	 */
-	private function print_value( $value ) {
-		if ( is_array( $value ) || is_object( $value ) ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r -- intended here.
-			return print_r( $value, true );
-		}
-		return esc_html( $value );
-	}
-
-	/**
 	 * Renders the admin page.
 	 *
 	 * @return void

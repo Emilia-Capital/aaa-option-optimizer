@@ -27,6 +27,7 @@ class Plugin {
 		$this->accessed_options = get_option( 'option_optimizer', [ 'used_options' => [] ] )['used_options'];
 
 		// Hook into all actions and filters to monitor option accesses.
+		// @phpstan-ignore-next-line -- The 'all' hook does not need a return.
 		add_filter( 'all', [ $this, 'monitor_option_accesses' ] );
 
 		// Use the shutdown action to update the option with tracked data.
