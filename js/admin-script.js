@@ -81,8 +81,7 @@ jQuery( document ).ready(
 					{ name: 'calls', searchable: false },
 					{ name: 'actions', searchable: false, orderable: false }
 				]
-			}
-			else if (selector === '#all_options_table') {
+			} else if (selector === '#all_options_table') {
 				return [
 				{ name: 'name', data: 'name' },
 				{ name: 'source', data: 'plugin' },
@@ -92,7 +91,7 @@ jQuery( document ).ready(
 					searchable: false,
 					render: data => '<span class="num">' + data + '</span>'
 				},
-				{ 
+				{
 					name: 'autoload',
 					data: 'autoload',
 					className: 'autoload'
@@ -146,14 +145,14 @@ jQuery( document ).ready(
 			const popoverContent = '<div id=" ' + row.name + '" popover class="aaa-option-optimizer-popover">' +
 			'<button class="aaa-option-optimizer-popover__close" popovertarget="' + row.name + '" popovertargetaction="hide">X</button>' +
 			'<p><strong>Value of <code>' + row.name + '</code></strong></p>' +
-			'<pre>' + row.value + '</pre>' + 
+			'<pre>' + row.value + '</pre>' +
 			'</div>';
 
-			const actions        = [
+			const actions = [
 			'<button class="button dashicon" popovertarget="' + row.name + '"><span class="dashicons dashicons-search"></span>' + aaaOptionOptimizer.i18n.showValue + '</button>',
 			popoverContent,
 			row.autoload === 'no' ?
-				'<button class="button dashicon add-autoload" data-option="'+ row.name +'"><span class="dashicons dashicons-plus"></span>' + aaaOptionOptimizer.i18n.addAutoload + '</button>' :
+				'<button class="button dashicon add-autoload" data-option="' + row.name + '"><span class="dashicons dashicons-plus"></span>' + aaaOptionOptimizer.i18n.addAutoload + '</button>' :
 				'<button class="button dashicon remove-autoload" data-option="' + row.name + '"><span class="dashicons dashicons-minus"></span>' + aaaOptionOptimizer.i18n.removeAutoload + '</button>',
 				'<button class="button button-delete delete-option" data-option="' + row.name + '"><span class="dashicons dashicons-trash"></span>' + aaaOptionOptimizer.i18n.deleteOption + '</button >'
 			];
@@ -205,7 +204,7 @@ jQuery( document ).ready(
 				const autoloadStatus = action === 'add' ? 'yes' : 'no';
 				const buttonHTML     = action === 'add' ?
 				` < button class     = "button dashicon remove-autoload" data - option = "${optionName}" > < span class = "dashicons dashicons-minus" > < / span > ${aaaOptionOptimizer.i18n.removeAutoload} < / button > ` :
-				` < button class     = "button dashicon add-autoload" data - option = "${optionName}" > < span class = "dashicons dashicons-plus" > < / span > ${aaaOptionOptimizer.i18n.addAutoload} < / button > `;
+				` < button class = "button dashicon add-autoload" data - option = "${optionName}" > < span class = "dashicons dashicons-plus" > < / span > ${aaaOptionOptimizer.i18n.addAutoload} < / button > `;
 
 				$( `tr#option_${optionName}` ).find( 'td.autoload' ).text( autoloadStatus );
 				$( `tr#option_${optionName}` ).find( `button.${action === 'add' ? 'add' : 'remove'} - autoload` ).replaceWith( buttonHTML );

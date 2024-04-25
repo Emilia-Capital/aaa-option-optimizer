@@ -37,10 +37,13 @@ class Admin_Page {
 	/**
 	 * Register the settings link for the plugins page.
 	 *
-	 * @param array  $links The plugin action links.
-	 * @param string $file  The plugin file.
+	 * @param array<string, string> $links The plugin action links.
+	 * @param string                $file  The plugin file.
+	 *
+	 * @return array<string, string>
 	 */
 	public function filter_plugin_actions( $links, $file ): array {
+
 		/* Static so we don't call plugin_basename on every plugin row. */
 		static $this_plugin;
 		if ( ! $this_plugin ) {
@@ -119,13 +122,13 @@ class Admin_Page {
 			[
 				'root'  => esc_url_raw( rest_url() ),
 				'nonce' => wp_create_nonce( 'wp_rest' ),
-				'i18n' => [
+				'i18n'  => [
 					'filterBySource' => esc_html__( 'Filter by source', 'aaa-option-optimizer' ),
 					'showValue'      => esc_html__( 'Show value', 'aaa-option-optimizer' ),
 					'addAutoload'    => esc_html__( 'Add autoload', 'aaa-option-optimizer' ),
 					'removeAutoload' => esc_html__( 'Remove autoload', 'aaa-option-optimizer' ),
 					'deleteOption'   => esc_html__( 'Delete option', 'aaa-option-optimizer' ),
-				]
+				],
 			]
 		);
 	}
