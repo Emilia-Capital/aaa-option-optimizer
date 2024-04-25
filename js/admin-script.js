@@ -188,10 +188,7 @@ jQuery( document ).ready(
 
 										// Create select element.
 										let select            = document.createElement( 'select' );
-										select.placeholder    = 'Filter by source';
-										filterOption          = new Option( 'Filter by source', '',true,true );
-										filterOption.disabled = true;
-										select.add( filterOption );
+										select.add( new Option( 'All sources', '',true,true ) );
 										column.footer().replaceChildren( select );
 
 										// Apply listener for user change in value.
