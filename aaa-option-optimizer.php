@@ -19,6 +19,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'AAA_OPTION_OPTIMIZER_FILE', __FILE__ );
+define( 'AAA_OPTION_OPTIMIZER_DIR', __DIR__ );
+
+require_once __DIR__ . '/src/autoload.php';
 
 register_activation_hook( __FILE__, 'aaa_option_optimizer_activation' );
 
@@ -49,7 +52,6 @@ function aaa_option_optimizer_activation() {
  * @return void
  */
 function aaa_option_optimizer_init() {
-	require_once plugin_dir_path( __FILE__ ) . 'src/class-plugin.php';
 	$optimizer = new Emilia\OptionOptimizer\Plugin();
 	$optimizer->register_hooks();
 }

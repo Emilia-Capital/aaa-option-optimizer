@@ -32,15 +32,11 @@ class Plugin {
 		// Use the shutdown action to update the option with tracked data.
 		add_action( 'shutdown', [ $this, 'update_tracked_options' ] );
 
-		require_once plugin_dir_path( AAA_OPTION_OPTIMIZER_FILE ) . 'src/class-map-plugin-to-options.php';
-		require_once plugin_dir_path( AAA_OPTION_OPTIMIZER_FILE ) . 'src/class-rest.php';
 		// Register the REST routes.
 		$rest = new REST();
 		$rest->register_hooks();
 
 		if ( is_admin() ) {
-			require_once plugin_dir_path( AAA_OPTION_OPTIMIZER_FILE ) . 'src/class-admin-page.php';
-
 			// Register the admin page.
 			$admin_page = new Admin_Page();
 			$admin_page->register_hooks();
