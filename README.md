@@ -1,4 +1,5 @@
 [![CS](https://github.com/emilia-capital/aaa-option-optimizer/actions/workflows/cs.yml/badge.svg)](https://github.com/emilia-capital/aaa-option-optimizer/actions/workflows/cs.yml)
+[![PHPStan](https://github.com/Emilia-Capital/aaa-option-optimizer/actions/workflows/phpstan.yml/badge.svg)](https://github.com/Emilia-Capital/aaa-option-optimizer/actions/workflows/phpstan.yml)
 [![Lint](https://github.com/emilia-capital/aaa-option-optimizer/actions/workflows/lint.yml/badge.svg)](https://github.com/emilia-capital/aaa-option-optimizer/actions/workflows/lint.yml)
 [![Security](https://github.com/emilia-capital/aaa-option-optimizer/actions/workflows/security.yml/badge.svg)](https://github.com/emilia-capital/aaa-option-optimizer/actions/workflows/security.yml)
 
