@@ -90,6 +90,14 @@
     "seo-by-rank-math": {
         "name": "Rank Math SEO with AI Best SEO Tools",
         "option_prefixes": ["rank_math_"]
+    },
+    "all-in-one-seo-pack": {
+        "name": "AIOSEO – The Best WordPress SEO Plugin & Toolkit",
+        "option_prefixes": ["aioseo_","widget_aioseo"]
+    },
+    "generateblocks": {
+        "name": "GenerateBlocks",
+        "option_prefixes": ["generateblocks_"]
     }
 	
 }
