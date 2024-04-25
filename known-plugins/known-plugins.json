@@ -53,7 +53,7 @@
 	},
     "woocommerce": {
         "name": "WooCommerce",
-        "option_prefixes": ["wc_", "_transient__woocommerce_"]
+        "option_prefixes": ["wc_", "_transient__woocommerce_", "woocommerce_"]
     },
     "wordpress": {
         "name": "WordPress",
@@ -61,7 +61,7 @@
     },
     "wpml": {
         "name": "WPML",
-        "option_prefixes": ["_wpml_"]
+        "option_prefixes": ["_wpml_", "wpml_", "otgs-", "otgs_", "_icl_"]
     },
     "wpvivid-backuprestore": {
         "name": "WPvivid Backup Plugin",
@@ -98,6 +98,26 @@
     "generateblocks": {
         "name": "GenerateBlocks",
         "option_prefixes": ["generateblocks_"]
+    },
+    "perfmatters": {
+        "name": "Perfmatters",
+        "option_prefixes": ["perfmatters_"]
+    },
+    "bunnycdn": {
+        "name": "bunny.net – WordPress CDN Plugin",
+        "option_prefixes": ["bunny"]
+    },
+    "gravityforms": {
+        "name": "Gravity Forms",
+        "option_prefixes": ["gforms_"]
+    },
+    "js_composer": {
+        "name": "Visual Composer Website Builder, Landing Page Builder, Custom Theme Builder, Maintenance Mode & Coming Soon Pages",
+        "option_prefixes": ["vcv-"]
+    },
+    "porto-functionality": {
+        "name": "Porto Theme - Functionality",
+        "option_prefixes": ["porto_"]
     }
 	
 }
