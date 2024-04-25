@@ -24,20 +24,20 @@ class Plugin {
 	 * @return void
 	 */
 	public function register_hooks() {
-		$this->accessed_options = get_option( 'option_optimizer', [ 'used_options' => [] ] )['used_options'];
+		$this->accessed_options = \get_option( 'option_optimizer', [ 'used_options' => [] ] )['used_options'];
 
 		// Hook into all actions and filters to monitor option accesses.
 		// @phpstan-ignore-next-line -- The 'all' hook does not need a return.
-		add_filter( 'all', [ $this, 'monitor_option_accesses' ] );
+		\add_filter( 'all', [ $this, 'monitor_option_accesses' ] );
 
 		// Use the shutdown action to update the option with tracked data.
-		add_action( 'shutdown', [ $this, 'update_tracked_options' ] );
+		\add_action( 'shutdown', [ $this, 'update_tracked_options' ] );
 
 		// Register the REST routes.
 		$rest = new REST();
 		$rest->register_hooks();
 
-		if ( is_admin() ) {
+		if ( \is_admin() ) {
 			// Register the admin page.
 			$admin_page = new Admin_Page();
 			$admin_page->register_hooks();
