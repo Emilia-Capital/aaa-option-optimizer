@@ -17,7 +17,7 @@
     },
     "complianz": {
         "name": "Complianz GDPR",
-        "option_prefixes": ["cmplz_"]
+        "option_prefixes": ["cmplz_", "complianz_"]
     },
     "duplicate-post": {
         "name": "Yoast Duplicate Post",
@@ -62,5 +62,34 @@
     "wpml": {
         "name": "WPML",
         "option_prefixes": ["_wpml_"]
+    },
+    "wpvivid-backuprestore": {
+        "name": "WPvivid Backup Plugin",
+        "option_prefixes": ["wpvivid_"]
+    },
+    "revslider": {
+        "revslider": "Slider Revolution",
+        "option_prefixes": ["revslider-"]
+    },
+    "wp-rocket": {
+        "name": "WP Rocket",
+        "option_prefixes": ["wp_rocket_"]
+    },
+    "cookiebot": {
+        "name": "Cookie banner plugin for WordPress – Cookiebot CMP by Usercentrics",
+        "option_prefixes": ["cookiebot_", "cookiebot-"]
+    },
+    "litespeed-cache": {
+        "name": "LiteSpeed Cache",
+        "option_prefixes": ["litespeed-", "_litespeed_"]
+    },
+    "fluentform": {
+        "name": "Fluent Forms",
+        "option_prefixes": ["_fluentform_", "fluentform_"]
+    },
+    "seo-by-rank-math": {
+        "name": "Rank Math SEO with AI Best SEO Tools",
+        "option_prefixes": ["rank_math_"]
     }
+	
 }
