@@ -100,12 +100,12 @@ class REST {
 
 		\register_rest_route(
 			'aaa-option-optimizer/v1',
-			'/all-options/',
+			'/all-options',
 			[
 				'methods'             => 'GET',
 				'callback'            => [ $this, 'get_all_options' ],
 				'permission_callback' => function () {
-					return true;
+					return current_user_can( 'manage_options' );
 				},
 			]
 		);

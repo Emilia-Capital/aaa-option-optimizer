@@ -137,7 +137,8 @@ jQuery( document ).ready(
 					{
 						pageLength: 25,
 						ajax: {
-							url: aaaOptionOptimizer.root + 'aaa-option-optimizer/v1/all-options/',
+							url: aaaOptionOptimizer.root + 'aaa-option-optimizer/v1/all-options',
+							headers: { 'X-WP-Nonce': aaaOptionOptimizer.nonce },
 							type: 'GET',
 							dataSrc: 'data',
 						},
