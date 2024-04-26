@@ -149,6 +149,18 @@ class Admin_Page {
 						'_MAX_',
 						'_ENTRIES-MAX_'
 					),
+					'sZeroRecords'   => esc_html__( 'No matching records found', 'aaa-option-optimizer' ),
+					'oAria'          => [
+						'orderable'        => esc_html__( ': Activate to sort', 'aaa-option-optimizer' ),
+						'orderableReverse' => esc_html__( ': Activate to invert sorting', 'aaa-option-optimizer' ),
+						'orderableRemove'  => esc_html__( ': Activate to remove sorting', 'aaa-option-optimizer' ),
+						'paginate'         => [
+							'first'    => esc_html__( 'First', 'aaa-option-optimizer' ),
+							'last'     => esc_html__( 'Last', 'aaa-option-optimizer' ),
+							'next'     => esc_html__( 'Next', 'aaa-option-optimizer' ),
+							'previous' => esc_html__( 'Previous', 'aaa-option-optimizer' ),
+						],
+					],
 				],
 			]
 		);
