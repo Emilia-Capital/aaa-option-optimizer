@@ -128,6 +128,27 @@ class Admin_Page {
 					'addAutoload'    => esc_html__( 'Add autoload', 'aaa-option-optimizer' ),
 					'removeAutoload' => esc_html__( 'Remove autoload', 'aaa-option-optimizer' ),
 					'deleteOption'   => esc_html__( 'Delete option', 'aaa-option-optimizer' ),
+
+					'search'         => esc_html__( 'Search:', 'aaa-option-optimizer' ),
+					'entries'        => [
+						'_' => \esc_html__( 'entries', 'aaa-option-optimizer' ),
+						'1' => \esc_html__( 'entry', 'aaa-option-optimizer' ),
+					],
+					'sInfo'          => sprintf(
+						// translators: %1$s is the start, %2$s is the end, %3$s is the total, %4$s is the entries.
+						esc_html__( 'Showing %1$s to %2$s of %3$s %4$s', 'aaa-option-optimizer' ),
+						'_START_',
+						'_END_',
+						'_TOTAL_',
+						'_ENTRIES-TOTAL_'
+					),
+					'sInfoEmpty'      => esc_html__( 'Showing 0 to 0 of 0 entries', 'aaa-option-optimizer' ),
+					'sInfoFiltered'   => sprintf(
+						// translators: %1$s is the max, %2$s is the entries-max.
+						esc_html__( '(filtered from %1$s total %2$s)', 'aaa-option-optimizer' ),
+						'_MAX_',
+						'_ENTRIES-MAX_'
+					),
 				],
 			]
 		);
