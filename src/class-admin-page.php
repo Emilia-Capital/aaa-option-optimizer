@@ -142,8 +142,8 @@ class Admin_Page {
 						'_TOTAL_',
 						'_ENTRIES-TOTAL_'
 					),
-					'sInfoEmpty'      => esc_html__( 'Showing 0 to 0 of 0 entries', 'aaa-option-optimizer' ),
-					'sInfoFiltered'   => sprintf(
+					'sInfoEmpty'     => esc_html__( 'Showing 0 to 0 of 0 entries', 'aaa-option-optimizer' ),
+					'sInfoFiltered'  => sprintf(
 						// translators: %1$s is the max, %2$s is the entries-max.
 						esc_html__( '(filtered from %1$s total %2$s)', 'aaa-option-optimizer' ),
 						'_MAX_',
