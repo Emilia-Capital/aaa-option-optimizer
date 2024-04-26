@@ -49,6 +49,15 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 1.2 =
+
+Enhancements:
+
+* Overhaul of the UX, implementing proper tabs, better buttons and more.
+* Added a new "All options" tab, which loads all the options from the database and allows you to manage them.
+* Much improved recognition of core WordPress options and plugins under "Source".
+* Allow filtering of all tables by Source so you can more easily find the options you're looking for.
+
 = 1.1.1 =
 
 Implement the missing functionality to create an option with value `false` when it's being loaded but doesn't exist.

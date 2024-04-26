@@ -42,7 +42,7 @@ class REST {
 	public function register_rest_routes() {
 		\register_rest_route(
 			'aaa-option-optimizer/v1',
-			'/update-autoload/(?P<option_name>[a-zA-Z0-9-_\.\:]+)',
+			'/update-autoload',
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'update_option_autoload' ],
@@ -64,7 +64,7 @@ class REST {
 
 		\register_rest_route(
 			'aaa-option-optimizer/v1',
-			'/delete-option/(?P<option_name>[a-zA-Z0-9-_\.\:]+)',
+			'/delete-option',
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'delete_option' ],
@@ -82,7 +82,7 @@ class REST {
 
 		\register_rest_route(
 			'aaa-option-optimizer/v1',
-			'/create-option-false/(?P<option_name>[a-zA-Z0-9-_\.\:]+)',
+			'/create-option-false',
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'create_option_false' ],

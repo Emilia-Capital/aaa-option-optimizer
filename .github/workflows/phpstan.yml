@@ -1,4 +1,4 @@
-name: Run PHPStan
+name: PHPStan
 
 on:
   # Run on pushes to select branches and on all pull requests.

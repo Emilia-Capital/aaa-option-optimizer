@@ -277,12 +277,13 @@ class Admin_Page {
 		if ( ! empty( $unused_options ) ) {
 			echo '<p>' . esc_html__( 'The following options are autoloaded on each pageload, but AAA Option Optimizer has not been able to detect them being used.', 'aaa-option-optimizer' );
 			echo '<table style="width:100%" id="unused_options_table" class="aaa_option_table">';
-			$this->table_section( 'thead', [ 'option', 'source', 'size', 'actions' ] );
+			$this->table_section( 'thead', [ 'option', 'source', 'size', 'autoload', 'actions' ] );
 			echo '<tbody>';
 			foreach ( $unused_options as $option => $value ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '"><td>' . esc_html( $option ) . '</td>';
 				echo '<td>' . esc_html( $this->get_plugin_name( $option ) ) . '</td>';
 				echo '<td><span class="num">' . esc_html( $this->get_length( $value ) ) . '</span></td>';
+				echo '<td class="autoload">yes</td>';
 				echo '<td class="actions">';
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output escaped in get_value_button.
 				echo $this->get_value_button( $option, $value );
@@ -291,7 +292,7 @@ class Admin_Page {
 				echo '</td></tr>';
 			}
 			echo '</tbody>';
-			$this->table_section( 'tfoot', [ 'option', 'source', 'size', 'actions' ] );
+			$this->table_section( 'tfoot', [ 'option', 'source', 'size', 'autoload', 'actions' ] );
 			echo '</table>';
 		} else {
 			echo '<p>' . esc_html__( 'All autoloaded options are in use.', 'aaa-option-optimizer' ) . '</p>';
@@ -307,13 +308,14 @@ class Admin_Page {
 			echo '<h2 id="used-not-autoloaded">' . esc_html__( 'Used, but not autoloaded options', 'aaa-option-optimizer' ) . '</h2>';
 			echo '<p>' . esc_html__( 'The following options are *not* autoloaded on each pageload, but AAA Option Optimizer has detected that they are being used. If one of the options below has been called a lot and is not very big, you might consider adding autoload to that option.', 'aaa-option-optimizer' );
 			echo '<table style="width:100%;" id="used_not_autoloaded_table" class="aaa_option_table">';
-			$this->table_section( 'thead', [ 'option', 'source', 'size', 'calls', 'actions' ] );
+			$this->table_section( 'thead', [ 'option', 'source', 'size', 'autoload', 'calls', 'actions' ] );
 			echo '<tbody>';
 			foreach ( $non_autoloaded_options_full as $option => $arr ) {
 				echo '<tr id="option_' . esc_attr( str_replace( ':', '', str_replace( '.', '', $option ) ) ) . '">';
 				echo '<td>' . esc_html( $option ) . '</td>';
 				echo '<td>' . esc_html( $this->get_plugin_name( $option ) ) . '</td>';
 				echo '<td><span class="num">' . esc_html( $this->get_length( $arr['value'] ) ) . '</span></td>';
+				echo '<td class="autoload">no</td>';
 				echo '<td>' . esc_html( $arr['count'] ) . '</td>';
 				echo '<td class="actions">';
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output escaped in get_value_button.
@@ -322,7 +324,7 @@ class Admin_Page {
 				echo '</td></tr>';
 			}
 			echo '</tbody>';
-			$this->table_section( 'tfoot', [ 'option', 'source', 'size', 'calls', 'actions' ] );
+			$this->table_section( 'tfoot', [ 'option', 'source', 'size', 'autoload', 'calls', 'actions' ] );
 			echo '</table>';
 		} else {
 			echo '<p>' . esc_html__( 'All options that are used are autoloaded.', 'aaa-option-optimizer' ) . '</p>';
