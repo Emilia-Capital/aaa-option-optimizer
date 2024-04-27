@@ -35,7 +35,7 @@ For security issues, please see the next question.
 
 = How can I add recognized plugins? =
 
-Please do a pull request via GitHub on [this file](https://github.com/Emilia-Capital/aaa-option-optimizer/blob/main/known-plugins/known-plugins.json) in the plugin.
+Please do a pull request via GitHub on [this file](https://github.com/Emilia-Capital/aaa-option-optimizer/blob/develop/known-plugins/known-plugins.json) in the plugin.
 
 = How can I report security bugs? =
 
