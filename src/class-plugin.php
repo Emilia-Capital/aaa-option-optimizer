@@ -47,6 +47,7 @@ class Plugin {
 	 * @return Plugin
 	 */
 	public static function get_instance() {
+		// @phpstan-ignore-next-line -- The 'instance' property is set in the constructor.
 		if ( ! self::$instance ) {
 			self::$instance = new self();
 		}
