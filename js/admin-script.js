@@ -55,6 +55,8 @@ jQuery( document ).ready(
 				options.rowId = 'row_id';
 			}
 
+			options.language = aaaOptionOptimizer.i18n;
+
 			const dataTable = new DataTable( selector, options );
 		}
 
