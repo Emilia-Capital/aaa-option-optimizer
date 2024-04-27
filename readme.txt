@@ -4,7 +4,7 @@ Tags: options, database, cleanup
 Requires at least: 6.2
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.2
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -33,6 +33,10 @@ Please use [our GitHub](https://github.com/emilia-Capital/aaa-option-optimizer/)
 
 For security issues, please see the next question.
 
+= How can I add recognized plugins? =
+
+Please do a pull request via GitHub on [this file](https://github.com/Emilia-Capital/aaa-option-optimizer/blob/main/known-plugins/known-plugins.json) in the plugin.
+
 = How can I report security bugs? =
 
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/aaa-option-optimizer)
@@ -45,7 +49,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Screenshots ==
 
-1. Screenshot of the admin screen.
+1. Screenshot of the admin screen, initial tab.
+2. Screenshot of the "All options" screen, showing you can browse all the options.
 
 == Changelog ==
 
@@ -54,9 +59,12 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 Enhancements:
 
 * Overhaul of the UX, implementing proper tabs, better buttons and more.
-* Added a new "All options" tab, which loads all the options from the database and allows you to manage them.
-* Much improved recognition of core WordPress options and plugins under "Source".
-* Allow filtering of all tables by Source so you can more easily find the options you're looking for.
+* Added a new "All options" tab, which, when you hit the button, loads all the options from the database and allows you to manage them.
+* Added a "Reset data" button which resets the tracking data.
+* Added a link to the Optimize Options page from the Plugins page.
+* Much improved recognition of core WordPress options, themes and plugins under "Source", thanks in part to pull requests from [Rogier Lankhorst](https://profiles.wordpress.org/rogierlankhorst/) and [system4pc](https://github.com/system4pc).
+* You can now also filter all tables by Source so you can more easily find the options you're looking for.
+* Many code and speed improvements under the hood, including adding a class autoloader and some i18n fixes.
 
 = 1.1.1 =
 
