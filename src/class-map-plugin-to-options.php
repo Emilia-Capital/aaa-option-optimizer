@@ -37,7 +37,9 @@ class Map_Plugin_To_Options {
 		foreach ( $this->plugins_list as $plugin ) {
 			foreach ( $plugin['option_prefixes'] as $prefix ) {
 				if ( strpos( $option, $prefix ) === 0 ) {
-					return $plugin['name'];
+					if ( isset( $plugin['name'] ) ) {
+						return $plugin['name'];
+					}
 				}
 			}
 		}

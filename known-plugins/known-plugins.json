@@ -215,7 +215,7 @@
         "option_prefixes": ["wpvivid_"]
     },
     "revslider": {
-        "revslider": "Slider Revolution",
+        "name": "Slider Revolution",
         "option_prefixes": ["revslider-"]
     },
     "wp-rocket": {
