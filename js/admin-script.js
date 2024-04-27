@@ -148,7 +148,6 @@ jQuery( document ).ready(
 		 * @returns {string} - The HTML for the value column.
 		 */
 		function renderValueColumn(row) {
-			console.log( row );
 			const popoverContent = '<div id="popover_' + row.name + '" popover class="aaa-option-optimizer-popover">' +
 			'<button class="aaa-option-optimizer-popover__close" popovertarget="popover_' + row.name + '" popovertargetaction="hide">X</button>' +
 			'<p><strong>Value of <code>' + row.name + '</code></strong></p>' +
