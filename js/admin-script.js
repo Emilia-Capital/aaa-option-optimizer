@@ -165,6 +165,25 @@ jQuery( document ).ready(
 			return actions.join( '' );
 		}
 
+		$( '#aaa-option-reset-data' ).on(
+			'click',
+			function (e) {
+				e.preventDefault();
+				$.ajax(
+					{
+						url: aaaOptionOptimizer.root + 'aaa-option-optimizer/v1/reset',
+						method: 'POST',
+						beforeSend: xhr => xhr.setRequestHeader( 'X-WP-Nonce', aaaOptionOptimizer.nonce ),
+						success: response => window.location = window.location.href + '&tracking_reset=true',
+						error: response => console.error(
+							'Failed to reset tracking.',
+							response
+						)
+					}
+				);
+			}
+		);
+
 		/**
 		 * Handles the table actions (add-autoload, remove-autoload, delete-option).
 		 *

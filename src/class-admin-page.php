@@ -266,7 +266,15 @@ class Admin_Page {
 			) . '</p>';
 
 		echo '<h2>' . esc_html__( 'Optimize', 'aaa-option-optimizer' ) . '</h2>';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce is used for REST API.
+		if ( isset( $_GET['tracking_reset'] ) && $_GET['tracking_reset'] === 'true' ) {
+			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Tracking data has been reset.', 'aaa-option-optimizer' ) . '</p></div>';
+			// Take the parameter out of the URL without reloading the page.
+			echo '<script>window.history.pushState({}, document.title, window.location.href.replace( \'&tracking_reset=true\', \'\' ) );</script>';
+		}
+		echo '<div class="aaa-option-optimizer-reset"><button id="aaa-option-reset-data" class="button button-delete reset-data">' . esc_html__( 'Reset data', 'aaa-option-optimizer' ) . '</button></div>';
 		echo '<p>' . esc_html__( 'We\'ve found the following things you can maybe optimize:', 'aaa-option-optimizer' ) . '</p>';
+
 		?>
 	<div class="aaa-option-optimizer-tabs">
 			<input class="input" name="tabs" type="radio" id="tab-1" checked="checked"/>

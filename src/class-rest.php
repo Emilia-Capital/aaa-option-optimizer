@@ -109,6 +109,28 @@ class REST {
 				},
 			]
 		);
+
+		\register_rest_route(
+			'aaa-option-optimizer/v1',
+			'/reset',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'reset_stats' ],
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			]
+		);
+	}
+
+	/**
+	 * Update autoload status of an option.
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function reset_stats() {
+		Plugin::get_instance()->reset();
+		return new \WP_REST_Response( [ 'success' => true ], 200 );
 	}
 
 	/**

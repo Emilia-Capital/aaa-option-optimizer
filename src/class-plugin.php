@@ -12,11 +12,46 @@ namespace Emilia\OptionOptimizer;
  */
 class Plugin {
 	/**
+	 * The instance of the plugin.
+	 *
+	 * @var Plugin
+	 */
+	public static $instance;
+
+	/**
 	 * Holds the names of the options accessed during the request.
 	 *
 	 * @var string[]
 	 */
 	protected $accessed_options = [];
+
+	/**
+	 * Whether the plugin should reset the option_optimizer data.
+	 *
+	 * @var boolean
+	 */
+	protected $should_reset = false;
+
+	/**
+	 * Initializes the plugin.
+	 *
+	 * @return void
+	 */
+	public function __construct() {
+		self::$instance = $this;
+	}
+
+	/**
+	 * Gets the instance of the plugin.
+	 *
+	 * @return Plugin
+	 */
+	public static function get_instance() {
+		if ( ! self::$instance ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
 
 	/**
 	 * Registers hooks.
@@ -42,6 +77,17 @@ class Plugin {
 			$admin_page = new Admin_Page();
 			$admin_page->register_hooks();
 		}
+	}
+
+	/**
+	 * Sets the 'should_reset' property.
+	 *
+	 * @param boolean $should_reset Whether the plugin should reset the option_optimizer data.
+	 *
+	 * @return void
+	 */
+	public function reset( $should_reset = true ) {
+		$this->should_reset = $should_reset;
 	}
 
 	/**
@@ -89,6 +135,10 @@ class Plugin {
 		$option_optimizer = get_option( 'option_optimizer', [ 'used_options' => [] ] );
 
 		$option_optimizer['used_options'] = $this->accessed_options;
+
+		if ( $this->should_reset ) {
+			$option_optimizer['used_options'] = [];
+		}
 
 		// Update the 'option_optimizer' option with the new list.
 		update_option( 'option_optimizer', $option_optimizer, true );

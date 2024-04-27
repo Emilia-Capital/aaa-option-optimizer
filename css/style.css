@@ -12,10 +12,13 @@
 .aaa_option_table .actions .button {
 	margin-right: 20px;
 }
-.aaa_option_table .actions .button-delete {
+.aaa_option_table .actions .button-delete, .aaa-option-optimizer-reset .button-delete {
 	margin-right: 0;
 	color: #a00;
 	border-color: #a00;
+}
+.aaa-option-optimizer-reset .button-delete {
+	margin-bottom: 10px;
 }
 .aaa_option_table .actions .button span.dashicons, .aaa_option_table .button.dashicon span.dashicons {
 	padding: 0;
@@ -76,7 +79,12 @@ div.dt-container .dt-input {
 	cursor: pointer;
 }
 
+.aaa-option-optimizer-reset {
+	float: right;
+}
+
 .aaa-option-optimizer-tabs {
+	clear: both;
 	display: flex;
 	flex-wrap: wrap;
 	max-width: 100%;
