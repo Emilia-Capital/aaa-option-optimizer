@@ -35,10 +35,6 @@
         "name": "Google Analytics for WordPress by MonsterInsights",
         "option_prefixes": ["yst_"]
     },
-    "gravity-forms": {
-        "name": "Gravity Forms",
-        "option_prefixes": ["gf_"]
-    },
     "really-simple-ssl": {
         "name": "Really Simple SSL",
         "option_prefixes": ["rsssl_"]
@@ -109,7 +105,7 @@
     },
     "gravityforms": {
         "name": "Gravity Forms",
-        "option_prefixes": ["gforms_"]
+        "option_prefixes": ["gforms_", "gf_"]
     },
     "js_composer": {
         "name": "Visual Composer Website Builder, Landing Page Builder, Custom Theme Builder, Maintenance Mode & Coming Soon Pages",
@@ -118,6 +114,13 @@
     "porto-functionality": {
         "name": "Porto Theme - Functionality",
         "option_prefixes": ["porto_"]
-    }
-	
+    },
+    "worker": {
+        "name": "ManageWP Worker",
+        "option_prefixes": ["mwp_", "worker_"]
+    },
+    "breeze": {
+        "name": "Breeze – WordPress Cache Plugin",
+        "option_prefixes": ["breeze_"]
+    }	
 }
