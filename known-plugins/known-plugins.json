@@ -15,6 +15,14 @@
         "name": "Affiliate WP",
         "option_prefixes": ["affwp_"]
     },
+	"all-in-one-seo-pack": {
+        "name": "AIOSEO - The Best WordPress SEO Plugin & Toolkit",
+        "option_prefixes": ["aioseo_","widget_aioseo"]
+    },
+	"bunnycdn": {
+        "name": "bunny.net - WordPress CDN Plugin",
+        "option_prefixes": ["bunny"]
+    },
     "burst": {
         "name": "Burst Statistics",
         "option_prefixes": ["burst_"]
@@ -22,6 +30,10 @@
     "complianz": {
         "name": "Complianz GDPR",
         "option_prefixes": ["cmplz_", "complianz_"]
+    },
+	"cookiebot": {
+        "name": "Cookie banner plugin for WordPress – Cookiebot CMP by Usercentrics",
+        "option_prefixes": ["cookiebot_", "cookiebot-"]
     },
     "duplicate-post": {
         "name": "Yoast Duplicate Post",
@@ -39,13 +51,37 @@
         "name": "Fewer Tags",
         "option_prefixes": ["fewer_tags"]
     },
+	"fluentform": {
+        "name": "Fluent Forms",
+        "option_prefixes": ["_fluentform_", "fluentform_"]
+    },
+	"generateblocks": {
+        "name": "GenerateBlocks",
+        "option_prefixes": ["generateblocks_"]
+    },
     "google-analytics-for-wordpress": {
         "name": "Google Analytics for WordPress by MonsterInsights",
         "option_prefixes": ["yst_"]
     },
     "gravity-forms": {
         "name": "Gravity Forms",
-        "option_prefixes": ["gf_"]
+        "option_prefixes": ["gf_","gforms_"]
+    },
+	"js_composer": {
+        "name": "Visual Composer Website Builder, Landing Page Builder, Custom Theme Builder, Maintenance Mode & Coming Soon Pages",
+        "option_prefixes": ["vcv-"]
+    },
+	"litespeed-cache": {
+        "name": "LiteSpeed Cache",
+        "option_prefixes": ["litespeed-", "_litespeed_"]
+    },
+	"perfmatters": {
+        "name": "Perfmatters",
+        "option_prefixes": ["perfmatters_"]
+    },
+    "porto-functionality": {
+        "name": "Porto Theme - Functionality",
+        "option_prefixes": ["porto_"]
     },
     "really-simple-ssl": {
         "name": "Really Simple SSL",
@@ -54,6 +90,14 @@
     "redirection": {
         "name": "Redirection",
         "option_prefixes": ["redirection_"]
+    },
+	"revslider": {
+        "name": "Slider Revolution",
+        "option_prefixes": ["revslider-"]
+    },
+	"seo-by-rank-math": {
+        "name": "Rank Math SEO with AI Best SEO Tools",
+        "option_prefixes": ["rank_math_"]
     },
     "updraft": {
         "name": "Updraft Plus",
@@ -210,60 +254,12 @@
         "name": "WPML",
         "option_prefixes": ["_wpml_", "wpml_", "otgs-", "otgs_", "_icl_"]
     },
-    "wpvivid-backuprestore": {
-        "name": "WPvivid Backup Plugin",
-        "option_prefixes": ["wpvivid_"]
-    },
-    "revslider": {
-        "name": "Slider Revolution",
-        "option_prefixes": ["revslider-"]
-    },
     "wp-rocket": {
         "name": "WP Rocket",
         "option_prefixes": ["wp_rocket_"]
     },
-    "cookiebot": {
-        "name": "Cookie banner plugin for WordPress – Cookiebot CMP by Usercentrics",
-        "option_prefixes": ["cookiebot_", "cookiebot-"]
-    },
-    "litespeed-cache": {
-        "name": "LiteSpeed Cache",
-        "option_prefixes": ["litespeed-", "_litespeed_"]
-    },
-    "fluentform": {
-        "name": "Fluent Forms",
-        "option_prefixes": ["_fluentform_", "fluentform_"]
-    },
-    "seo-by-rank-math": {
-        "name": "Rank Math SEO with AI Best SEO Tools",
-        "option_prefixes": ["rank_math_"]
-    },
-    "all-in-one-seo-pack": {
-        "name": "AIOSEO - The Best WordPress SEO Plugin & Toolkit",
-        "option_prefixes": ["aioseo_","widget_aioseo"]
-    },
-    "generateblocks": {
-        "name": "GenerateBlocks",
-        "option_prefixes": ["generateblocks_"]
-    },
-    "perfmatters": {
-        "name": "Perfmatters",
-        "option_prefixes": ["perfmatters_"]
-    },
-    "bunnycdn": {
-        "name": "bunny.net - WordPress CDN Plugin",
-        "option_prefixes": ["bunny"]
-    },
-    "gravityforms": {
-        "name": "Gravity Forms",
-        "option_prefixes": ["gforms_"]
-    },
-    "js_composer": {
-        "name": "Visual Composer Website Builder, Landing Page Builder, Custom Theme Builder, Maintenance Mode & Coming Soon Pages",
-        "option_prefixes": ["vcv-"]
-    },
-    "porto-functionality": {
-        "name": "Porto Theme - Functionality",
-        "option_prefixes": ["porto_"]
+    "wpvivid-backuprestore": {
+        "name": "WPvivid Backup Plugin",
+        "option_prefixes": ["wpvivid_"]
     }
 }
