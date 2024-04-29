@@ -17,9 +17,20 @@ use WP_REST_Response;
 class REST {
 
 	/**
+	 * The map plugin to options class.
+	 *
+	 * @var Map_Plugin_To_Options
+	 */
+	private $map_plugin_to_options;
+
+	/**
 	 * Registers hooks.
+	 *
+	 * @return void
 	 */
 	public function register_hooks() {
+		$this->map_plugin_to_options = new Map_Plugin_To_Options();
+
 		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
 	}
 
@@ -31,7 +42,7 @@ class REST {
 	public function register_rest_routes() {
 		\register_rest_route(
 			'aaa-option-optimizer/v1',
-			'/update-autoload/(?P<option_name>[a-zA-Z0-9-_\.\:]+)',
+			'/update-autoload',
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'update_option_autoload' ],
@@ -53,7 +64,7 @@ class REST {
 
 		\register_rest_route(
 			'aaa-option-optimizer/v1',
-			'/delete-option/(?P<option_name>[a-zA-Z0-9-_\.\:]+)',
+			'/delete-option',
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'delete_option' ],
@@ -71,7 +82,7 @@ class REST {
 
 		\register_rest_route(
 			'aaa-option-optimizer/v1',
-			'/create-option-false/(?P<option_name>[a-zA-Z0-9-_\.\:]+)',
+			'/create-option-false',
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'create_option_false' ],
@@ -86,6 +97,64 @@ class REST {
 				],
 			]
 		);
+
+		\register_rest_route(
+			'aaa-option-optimizer/v1',
+			'/all-options',
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'get_all_options' ],
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			]
+		);
+
+		\register_rest_route(
+			'aaa-option-optimizer/v1',
+			'/reset',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'reset_stats' ],
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			]
+		);
+	}
+
+	/**
+	 * Update autoload status of an option.
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function reset_stats() {
+		Plugin::get_instance()->reset();
+		return new \WP_REST_Response( [ 'success' => true ], 200 );
+	}
+
+	/**
+	 * Update autoload status of an option.
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function get_all_options() {
+		global $wpdb;
+
+		$output = [];
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- We need to query all options.
+		$options = $wpdb->get_results( "SELECT option_name, option_value, autoload FROM $wpdb->options" );
+		foreach ( $options as $option ) {
+			$output[] = [
+				'name'     => $option->option_name,
+				'plugin'   => $this->map_plugin_to_options->get_plugin_name( $option->option_name ),
+				'value'    => $option->option_value,
+				'size'     => number_format( strlen( $option->option_value ) / 1024, 2 ),
+				'autoload' => $option->autoload,
+				'row_id'   => 'option_' . $option->option_name,
+			];
+		}
+		return new \WP_REST_Response( [ 'data' => $output ], 200 );
 	}
 
 	/**

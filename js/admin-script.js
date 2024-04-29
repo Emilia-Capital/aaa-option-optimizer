@@ -4,155 +4,259 @@
  * @package Emilia\OptionOptimizer
  */
 
+/**
+ * Initializes the data tables and sets up event handlers.
+ */
 jQuery( document ).ready(
 	function ($) {
-		if ( $( '#unused_options_table' ).length ) {
-			var table1 = new DataTable( '#unused_options_table', { columns: [ {}, {},{ searchable: false}, { searchable: false}, { searchable: false } ] } );
-		}
-		if ( $( '#used_not_autloaded_table' ).length ) {
-			var table2 = new DataTable( '#used_not_autloaded_table', { columns: [ null, null, { searchable: false }, { searchable: false }, { searchable: false }, { searchable: false } ] } );
-		}
-		if ( $( '#requested_do_not_exist_table' ).length ) {
-			var table3 = new DataTable( '#requested_do_not_exist_table', { columns: [ null, null, { searchable: false }, { searchable: false } ] } );
-		}
+		/**
+		 * Array of table selectors to initialize.
+		 *
+		 * @type {string[]}
+		 */
+		const tablesToInitialize = [
+			'#unused_options_table',
+			'#used_not_autoloaded_table',
+			'#requested_do_not_exist_table',
+		];
 
-		// Handle the "Remove Autoload" button click.
-		$( 'table tbody' ).on(
+		$( '#all_options_table' ).hide();
+		$( '#aaa_get_all_options' ).on(
 			'click',
-			'.add-autoload',
 			function (e) {
 				e.preventDefault();
+				$( '#all_options_table' ).show();
+				initializeDataTable( '#all_options_table' );
+				$( this ).hide();
+			}
+		);
 
-				var optionName = $( this ).data( 'option' );
-				var table      = $( this ).closest( 'table' ).DataTable();
+		/**
+		 * Initializes the DataTable for the given selector.
+		 *
+		 * @param {string} selector - The table selector.
+		 */
+		function initializeDataTable(selector) {
+			const options = {
+				pageLength: 25,
+				columns: getColumns( selector ),
+				initComplete: function () {
+					this.api().columns( 'source:name' ).every( setupColumnFilters );
+				}
+			};
 
-				var requestData = {
-					'autoload': 'yes'
+			if (selector === '#all_options_table') {
+				options.ajax  = {
+					url: aaaOptionOptimizer.root + 'aaa-option-optimizer/v1/all-options',
+					headers: { 'X-WP-Nonce': aaaOptionOptimizer.nonce },
+					type: 'GET',
+					dataSrc: 'data'
 				};
+				options.rowId = 'row_id';
+			}
 
+			options.language = aaaOptionOptimizer.i18n;
+
+			const dataTable = new DataTable( selector, options );
+		}
+
+		/**
+		 * Retrieves the columns configuration based on the selector.
+		 *
+		 * @param {string} selector - The table selector.
+		 *
+		 * @returns {Object[]} - The columns configuration.
+		 */
+		function getColumns(selector) {
+			const commonColumns = [
+				{ name: 'name' },
+				{ name: 'source' },
+				{ name: 'size', searchable: false },
+				{ name: 'autoload', className: 'autoload', searchable: false },
+				{ name: 'actions', searchable: false, orderable: false }
+			];
+
+			if (selector === '#requested_do_not_exist_table') {
+				return [
+					{ name: 'name' },
+					{ name: 'source', searchable: false },
+					{ name: 'calls', searchable: false },
+					{ name: 'actions', searchable: false, orderable: false }
+				];
+			} else if (selector === '#used_not_autoloaded_table') {
+				return [
+					{ name: 'name' },
+					{ name: 'source' },
+					{ name: 'size', searchable: false },
+					{ name: 'autoload', className: 'autoload', searchable: false },
+					{ name: 'calls', searchable: false },
+					{ name: 'actions', searchable: false, orderable: false }
+				]
+			} else if (selector === '#all_options_table') {
+				return [
+				{ name: 'name', data: 'name' },
+				{ name: 'source', data: 'plugin' },
+				{
+					name: 'size',
+					data: 'size',
+					searchable: false,
+					render: data => '<span class="num">' + data + '</span>'
+				},
+				{ name: 'autoload', data: 'autoload', className: 'autoload', searchable: false },
+				{
+					name: 'value',
+					data: 'value',
+					render: (data, type, row) => renderValueColumn( row ),
+					orderable: false,
+					searchable: false,
+					className: 'actions'
+				}
+				];
+			}
+
+			return commonColumns;
+		}
+
+		/**
+		 * Sets up the column filters for the DataTable.
+		 */
+		function setupColumnFilters() {
+			const column = this;
+			const select = document.createElement( 'select' );
+			select.add( new Option( aaaOptionOptimizer.i18n.filterBySource, '', true, true ) );
+			column.footer().replaceChildren( select );
+
+			select.addEventListener(
+				'change',
+				function () {
+					column.search( select.value, { exact: true } ).draw();
+				}
+			);
+
+			column.data().unique().sort().each(
+				function (d) {
+					select.add( new Option( d ) );
+				}
+			);
+		}
+
+		/**
+		 * Renders the value column for a row.
+		 *
+		 * @param {Object} row - The row data.
+		 *
+		 * @returns {string} - The HTML for the value column.
+		 */
+		function renderValueColumn(row) {
+			const popoverContent = '<div id="popover_' + row.name + '" popover class="aaa-option-optimizer-popover">' +
+			'<button class="aaa-option-optimizer-popover__close" popovertarget="popover_' + row.name + '" popovertargetaction="hide">X</button>' +
+			'<p><strong>Value of <code>' + row.name + '</code></strong></p>' +
+			'<pre>' + row.value + '</pre>' +
+			'</div>';
+
+			const actions = [
+				'<button class="button dashicon" popovertarget="popover_' + row.name + '"><span class="dashicons dashicons-search"></span>' + aaaOptionOptimizer.i18n.showValue + '</button>',
+				popoverContent,
+				row.autoload === 'no' ?
+					'<button class="button dashicon add-autoload" data-option="' + row.name + '"><span class="dashicons dashicons-plus"></span>' + aaaOptionOptimizer.i18n.addAutoload + '</button>' :
+					'<button class="button dashicon remove-autoload" data-option="' + row.name + '"><span class="dashicons dashicons-minus"></span>' + aaaOptionOptimizer.i18n.removeAutoload + '</button>',
+					'<button class="button button-delete delete-option" data-option="' + row.name + '"><span class="dashicons dashicons-trash"></span>' + aaaOptionOptimizer.i18n.deleteOption + '</button >'
+			];
+
+			return actions.join( '' );
+		}
+
+		$( '#aaa-option-reset-data' ).on(
+			'click',
+			function (e) {
+				e.preventDefault();
 				$.ajax(
 					{
-						url: aaaOptionOptimizer.root + 'aaa-option-optimizer/v1/update-autoload/' + optionName,
+						url: aaaOptionOptimizer.root + 'aaa-option-optimizer/v1/reset',
 						method: 'POST',
-						beforeSend: function (xhr) {
-							xhr.setRequestHeader( 'X-WP-Nonce', aaaOptionOptimizer.nonce );
-						},
-						data: requestData,
-						success: function (response) {
-							table
-								.row( 'tr#option_' + optionName )
-								.remove()
-								.draw( 'page' );
-						},
-						error: function (response) {
-							console.log( response );
-							alert( 'Failed to add autoload for ' + optionName );
-						}
+						beforeSend: xhr => xhr.setRequestHeader( 'X-WP-Nonce', aaaOptionOptimizer.nonce ),
+						success: response => window.location = window.location.href + '&tracking_reset=true',
+						error: response => console.error(
+							'Failed to reset tracking.',
+							response
+						)
 					}
 				);
 			}
 		);
 
-		// Handle the "Remove autoload" button click.
-		$( 'table tbody' ).on(
-			'click',
-			'.remove-autoload',
-			function (e) {
-				e.preventDefault();
+		/**
+		 * Handles the table actions (add-autoload, remove-autoload, delete-option).
+		 *
+		 * @param {Event} e - The click event.
+		 */
+		function handleTableActions(e) {
+			e.preventDefault();
+			const button     = $( this );
+			const table      = button.closest( 'table' ).DataTable();
+			const optionName = button.data( 'option' );
 
-				var optionName = $( this ).data( 'option' );
-				var table      = $( this ).closest( 'table' ).DataTable();
+			let requestData = { option_name: optionName };
+			let action      = '';
+			let route       = '';
 
-				var requestData = {
-					'autoload': 'no'
-				};
-
-				$.ajax(
-					{
-						url: aaaOptionOptimizer.root + 'aaa-option-optimizer/v1/update-autoload/' + optionName,
-						method: 'POST',
-						beforeSend: function (xhr) {
-							xhr.setRequestHeader( 'X-WP-Nonce', aaaOptionOptimizer.nonce );
-						},
-						data: requestData,
-						success: function (response) {
-							table
-								.row( 'tr#option_' + optionName )
-								.remove()
-								.draw( 'page' );
-						},
-						error: function (response) {
-							console.log( response );
-							alert( 'Failed to remove autoload for ' + optionName );
-						}
-					}
-				);
+			if ( button.hasClass( 'create-option-false' ) ) {
+				action = route = 'create-option-false';
+			} else if ( button.hasClass( 'delete-option' ) ) {
+				action = route = 'delete-option';
+			} else {
+				action               = button.hasClass( 'add-autoload' ) ? 'add-autoload' : 'remove-autoload';
+				route                = 'update-autoload';
+				requestData.autoload = ( action === 'add-autoload' ) ? 'yes' : 'no';
 			}
-		);
 
-		// Handle the "Delete Option" button click.
-		$( 'table tbody' ).on(
-			'click',
-			'.delete-option',
-			function (e) {
-				e.preventDefault();
+			$.ajax(
+				{
+					url: aaaOptionOptimizer.root + 'aaa-option-optimizer/v1/' + route,
+					method: 'POST',
+					beforeSend: xhr => xhr.setRequestHeader( 'X-WP-Nonce', aaaOptionOptimizer.nonce ),
+					data: requestData,
+					success: response => updateRowOnSuccess( response, table, optionName, action ),
+					error: response => console.error(
+						'Failed to ' + action + ' for ' + optionName + '.',
+						response
+					)
+				}
+			);
+		}
 
-				var optionName = $( this ).data( 'option' );
-				var table      = $( this ).closest( 'table' ).DataTable();
+		/**
+		 * Updates the row on successful AJAX response.
+		 *
+		 * @param {Object} response - The AJAX response.
+		 * @param {DataTable} table - The DataTable instance.
+		 * @param {string} optionName - The option name.
+		 * @param {string} action - The action performed.
+		 */
+		function updateRowOnSuccess(response, table, optionName, action) {
+			if ( action === 'delete-option' || action === 'create-option-false' ) {
+				table.row( 'tr#option_' + optionName ).remove().draw( 'page' );
+			} else if ( action === 'add-autoload' || action === 'remove-autoload' ) {
+				const autoloadStatus = action === 'add-autoload' ? 'yes' : 'no';
+				const buttonHTML     = action === 'add-autoload' ?
+				'<button class="button dashicon remove-autoload" data-option="' + optionName + '"><span class="dashicons dashicons-minus"></span>' + aaaOptionOptimizer.i18n.removeAutoload + '</button>':
+				'<button class="button dashicon add-autoload" data-option="' + optionName + '"><span class="dashicons dashicons-plus"></span>' + aaaOptionOptimizer.i18n.addAutoload + '</button>';
 
-				$.ajax(
-					{
-						url: aaaOptionOptimizer.root + 'aaa-option-optimizer/v1/delete-option/' + optionName,
-						method: 'POST',
-						beforeSend: function (xhr) {
-							xhr.setRequestHeader( 'X-WP-Nonce', aaaOptionOptimizer.nonce );
-						},
-						success: function (response) {
-							let cleanOptionName = optionName.replace( /\./g, '' ).replace( /\:/g, '' );
-							table
-								.row( 'tr#option_' + optionName )
-								.remove()
-								.draw( 'page' );
-						},
-						error: function (response) {
-							console.log( response );
-							alert( 'Failed to delete option ' + optionName );
-						}
-					}
-				);
+				$( 'tr#option_' + optionName ).find( 'td.autoload' ).text( autoloadStatus );
+				const oldButton = 'button.' + ( action === 'add-autoload' ? 'add' : 'remove' ) + '-autoload';
+				$( 'tr#option_' + optionName + ' ' + oldButton ).replaceWith( buttonHTML );
 			}
-		);
+		}
 
-		// Handle the "Create Option with value 'false'" button click.
-		$( 'table tbody' ).on(
-			'click',
-			'.create-option-false',
-			function (e) {
-				e.preventDefault();
+		// AJAX Event Handling (add-autoload, remove-autoload, delete-option).
+		$( 'table tbody' ).on( 'click', '.add-autoload, .remove-autoload, .delete-option, .create-option-false', handleTableActions );
 
-				var optionName = $( this ).data( 'option' );
-				var table      = $( this ).closest( 'table' ).DataTable();
-
-				$.ajax(
-					{
-						url: aaaOptionOptimizer.root + 'aaa-option-optimizer/v1/create-option-false/' + optionName,
-						method: 'POST',
-						beforeSend: function (xhr) {
-							xhr.setRequestHeader( 'X-WP-Nonce', aaaOptionOptimizer.nonce );
-						},
-						success: function (response) {
-							let cleanOptionName = optionName.replace( /\./g, '' ).replace( /\:/g, '' );
-							table
-								.row( 'tr#option_' + optionName )
-								.remove()
-								.draw( 'page' );
-						},
-						error: function (response) {
-							console.log( response );
-							alert( 'Failed to create option ' + optionName );
-						}
-					}
-				);
+		// Initialize data tables.
+		tablesToInitialize.forEach(
+			function (selector) {
+				if ($( selector ).length) {
+					initializeDataTable( selector );
+				}
 			}
 		);
 	}

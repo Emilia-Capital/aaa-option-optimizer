@@ -1,4 +1,5 @@
 [![CS](https://github.com/emilia-capital/aaa-option-optimizer/actions/workflows/cs.yml/badge.svg)](https://github.com/emilia-capital/aaa-option-optimizer/actions/workflows/cs.yml)
+[![PHPStan](https://github.com/Emilia-Capital/aaa-option-optimizer/actions/workflows/phpstan.yml/badge.svg)](https://github.com/Emilia-Capital/aaa-option-optimizer/actions/workflows/phpstan.yml)
 [![Lint](https://github.com/emilia-capital/aaa-option-optimizer/actions/workflows/lint.yml/badge.svg)](https://github.com/emilia-capital/aaa-option-optimizer/actions/workflows/lint.yml)
 [![Security](https://github.com/emilia-capital/aaa-option-optimizer/actions/workflows/security.yml/badge.svg)](https://github.com/emilia-capital/aaa-option-optimizer/actions/workflows/security.yml)
 
@@ -20,6 +21,10 @@ starting the name with AAA made sense.
 ### Do I need to take precautions?
 
 Yes!! Backup your database.
+
+### How can I add recognized plugins?
+
+Please do a pull request via GitHub on [this file](https://github.com/Emilia-Capital/aaa-option-optimizer/blob/develop/known-plugins/known-plugins.json) in the plugin.
 
 ### How can I report security bugs?
 

@@ -7,7 +7,7 @@
  * Plugin Name: AAA Option Optimizer
  * Plugin URI: https://joost.blog/plugins/aaa-option-optimizer/
  * Description: Tracks autoloaded options usage and allows the user to optimize them.
- * Version: 1.1.1
+ * Version: 1.2.1
  * License: GPL-3.0+
  * Author: Joost de Valk
  * Author URI: https://joost.blog/
@@ -19,6 +19,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'AAA_OPTION_OPTIMIZER_FILE', __FILE__ );
+define( 'AAA_OPTION_OPTIMIZER_DIR', __DIR__ );
+
+require_once __DIR__ . '/src/autoload.php';
 
 register_activation_hook( __FILE__, 'aaa_option_optimizer_activation' );
 
@@ -49,7 +52,6 @@ function aaa_option_optimizer_activation() {
  * @return void
  */
 function aaa_option_optimizer_init() {
-	require_once plugin_dir_path( __FILE__ ) . 'src/class-plugin.php';
 	$optimizer = new Emilia\OptionOptimizer\Plugin();
 	$optimizer->register_hooks();
 }
