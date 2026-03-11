@@ -26,6 +26,14 @@ class Plugin {
 	protected $accessed_options = [];
 
 	/**
+	 * Whether the plugin is currently processing an option access.
+	 * Used to prevent infinite recursion.
+	 *
+	 * @var bool
+	 */
+	protected $is_processing = false;
+
+	/**
 	 * Whether the plugin should reset the option_optimizer data.
 	 *
 	 * @var boolean
@@ -101,10 +109,16 @@ class Plugin {
 	 * @return void
 	 */
 	public function monitor_option_accesses_legacy( $tag ) {
+		if ( $this->is_processing ) {
+			return;
+		}
+
 		// Check if the tag is related to an option access.
 		if ( str_starts_with( $tag, 'option_' ) || str_starts_with( $tag, 'default_option_' ) ) {
-			$option_name = preg_replace( '#^(default_)?option_#', '', $tag );
+			$this->is_processing = true;
+			$option_name         = preg_replace( '#^(default_)?option_#', '', $tag );
 			$this->add_option_usage( $option_name );
+			$this->is_processing = false;
 		}
 	}
 
@@ -117,10 +131,15 @@ class Plugin {
 	 * @return mixed
 	 */
 	public function monitor_option_accesses_pre_option( $pre, $option_name ) {
+		if ( $this->is_processing ) {
+			return $pre;
+		}
 
 		// If the $pre is false the get_option() will not be short-circuited.
 		if ( ! defined( 'WP_SETUP_CONFIG' ) && false === $pre ) {
+			$this->is_processing = true;
 			$this->add_option_usage( $option_name );
+			$this->is_processing = false;
 		}
 
 		return $pre;
