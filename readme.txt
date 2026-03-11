@@ -1,10 +1,10 @@
 === AAA Option Optimizer ===
-Contributors: joostdevalk, aristath, filipi
+Contributors: joostdevalk, aristath, filipi, progressplanner
 Tags: options, database, cleanup
 Requires at least: 6.7
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -53,6 +53,10 @@ Please do a pull request via GitHub on [this file](https://github.com/ProgressPl
 2. Screenshot of the "All options" screen, showing you can browse all the options.
 
 == Changelog ==
+
+= 1.6.1 =
+
+* Fix infinite recursion in option access monitoring that could cause a fatal error in certain hosting environments.
 
 = 1.6.0
 
