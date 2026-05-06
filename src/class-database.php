@@ -195,8 +195,11 @@ class Database {
 
 		$table_name = self::get_table_name();
 
+		// Use `START TRANSACTION` (not `BEGIN`) so W3 Total Cache's DbCache layer
+		// recognizes it as a transaction and skips caching — `BEGIN` slips past its
+		// regex and triggers a fatal in wpdb::load_col_info() on the boolean result.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->query( 'BEGIN' );
+		$wpdb->query( 'START TRANSACTION' );
 
 		foreach ( array_chunk( $options, $chunk_size, true ) as $chunk ) {
 			$values       = [];
