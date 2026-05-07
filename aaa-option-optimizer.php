@@ -37,6 +37,11 @@ function aaa_option_optimizer_activation() {
 	// Create the custom table.
 	Progress_Planner\OptionOptimizer\Database::create_table();
 
+	// Schedule daily refresh of the known-plugins mapping.
+	if ( ! wp_next_scheduled( Progress_Planner\OptionOptimizer\Known_Plugins::CRON_HOOK ) ) {
+		wp_schedule_event( time(), 'daily', Progress_Planner\OptionOptimizer\Known_Plugins::CRON_HOOK );
+	}
+
 	$autoload_values = \wp_autoload_values_to_autoload();
 	$placeholders    = implode( ',', array_fill( 0, count( $autoload_values ), '%s' ) );
 
@@ -73,6 +78,8 @@ function aaa_option_optimizer_activation() {
 function aaa_option_optimizer_deactivation() {
 	$aaa_option_value = get_option( 'option_optimizer' );
 	update_option( 'option_optimizer', $aaa_option_value, false );
+
+	wp_clear_scheduled_hook( Progress_Planner\OptionOptimizer\Known_Plugins::CRON_HOOK );
 }
 
 /**

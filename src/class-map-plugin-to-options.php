@@ -16,7 +16,7 @@ class Map_Plugin_To_Options {
 	/**
 	 * List of plugins we can recognize.
 	 *
-	 * @var object[]
+	 * @var array<string, array<string, mixed>>
 	 */
 	private $plugins_list = [];
 
@@ -28,9 +28,9 @@ class Map_Plugin_To_Options {
 	 * @return string
 	 */
 	public function get_plugin_name( string $option ): string {
-		$plugins_list = [];
 		if ( empty( $this->plugins_list ) ) {
-			$this->plugins_list = json_decode( file_get_contents( plugin_dir_path( AAA_OPTION_OPTIMIZER_FILE ) . 'known-plugins/known-plugins.json' ), true );
+			$known              = new Known_Plugins();
+			$this->plugins_list = $known->get();
 		}
 
 		// for each plugin in the list, check if the option starts with the prefix.
