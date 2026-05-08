@@ -208,7 +208,7 @@ class Admin_Page {
 					'deleteOption'           => \esc_html__( 'Delete', 'aaa-option-optimizer' ),
 					'createOptionFalse'      => \esc_html__( 'Create option with value false', 'aaa-option-optimizer' ),
 					'unknownLabel'           => \esc_html__( 'Unknown', 'aaa-option-optimizer' ),
-					'reportOrigin'           => \esc_html__( 'Report origin', 'aaa-option-optimizer' ),
+					'reportOrigin'           => \esc_html__( 'Report', 'aaa-option-optimizer' ),
 					'reportOriginOf'         => \esc_html__( 'Report origin of', 'aaa-option-optimizer' ),
 					'reportSlugOrUrlLabel'   => \esc_html__( 'wp.org slug or URL', 'aaa-option-optimizer' ),
 					'reportSlugPlaceholder'  => \esc_html__( 'e.g. wp125 or https://wordpress.org/plugins/wp125/', 'aaa-option-optimizer' ),

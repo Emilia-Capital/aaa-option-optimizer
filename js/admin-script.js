@@ -435,9 +435,9 @@ jQuery( document ).ready( function () {
 		return `${ renderReportPopover( row, popoverId ) }
 			<button type="button" class="aaa-report-trigger" popovertarget="${ popoverId }" data-option="${ escapeHtml(
 				row.name
-			) }">
-				${ label } &mdash; ${ aaaOptionOptimizer.i18n.reportOrigin }?
-			</button>`;
+			) }">${ label }<span class="aaa-report-trigger__action">${
+				aaaOptionOptimizer.i18n.reportOrigin
+			}</span></button>`;
 	}
 
 	/**
