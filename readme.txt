@@ -52,7 +52,30 @@ Please do a pull request via GitHub on [this file](https://github.com/ProgressPl
 1. Screenshot of the admin screen, initial tab.
 2. Screenshot of the "All options" screen, showing you can browse all the options.
 
+== External services ==
+
+This plugin connects to two external services to identify the source plugins of WordPress options.
+
+= WordPress.org plugin directory (api.wordpress.org and ps.w.org) =
+
+Once a day, the plugin fetches an updated list of recognized plugins from `https://ps.w.org/aaa-option-optimizer/assets/known-plugins.json`. This lets the plugin identify newly-added plugins as the maintained list grows, without requiring a plugin update. Only the JSON file is requested; no data is sent.
+
+When you click "Report" on an option whose source is "Unknown" and type a plugin slug, the plugin queries `https://api.wordpress.org/plugins/info/1.0/{slug}.json` to verify the slug exists and to display the official plugin name for confirmation. Only the slug you type is sent.
+
+WordPress.org terms of service: https://wordpress.org/about/privacy/
+
+= Origin reporting endpoint (option-optimizer-api.progressplanner.com) =
+
+When you submit a "Report origin" form, the plugin sends the option name you reported, the wp.org plugin slug you supplied, and your site's hostname to `https://option-optimizer-api.progressplanner.com/submit`. The submission is recorded as a GitHub issue for a maintainer to review and add to the recognized plugins list. The site hostname is hashed before storage and never published. The option name and slug appear in the public GitHub issue. Submissions only happen when you click Submit on the Report form; nothing is sent automatically.
+
+The endpoint is operated by the plugin maintainers. The submission URL can be overridden via the `aaa_option_optimizer_report_url` filter for users who want to disable or redirect the feature.
+
 == Changelog ==
+
+= 1.7.0 =
+
+* Add "Report origin" feature: for options whose source plugin is unknown, users can submit the matching wp.org slug to help maintainers expand the recognized plugins list. Submissions land as GitHub issues for maintainer review; no auto-merge.
+* Recognized-plugins list now refreshes from wp.org once a day in the background, so the list grows for users without requiring plugin updates.
 
 = 1.6.1 =
 
