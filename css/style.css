@@ -98,20 +98,18 @@ div.dt-container .dt-input {
 	font: inherit;
 	color: inherit;
 	cursor: pointer;
-	white-space: nowrap;
-	line-height: inherit;
+	line-height: 1.4;
+	text-align: left;
 }
 .aaa-report-trigger .aaa-report-trigger__action {
+	display: block;
 	color: #2271b1;
-	margin-left: 4px;
 	text-decoration: underline;
-	text-decoration-style: dotted;
 	text-underline-offset: 2px;
 }
 .aaa-report-trigger:hover .aaa-report-trigger__action,
 .aaa-report-trigger:focus-visible .aaa-report-trigger__action {
 	color: #135e96;
-	text-decoration-style: solid;
 }
 .aaa-report-popover {
 	min-width: 380px;
