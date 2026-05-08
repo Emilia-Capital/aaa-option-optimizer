@@ -91,6 +91,31 @@ div.dt-container .dt-input {
 .aaa-option-optimizer-popover__close:hover {
 	cursor: pointer;
 }
+.aaa-report-trigger {
+	background: none;
+	border: 1px dashed #c3c4c7;
+	color: #2271b1;
+	padding: 2px 8px;
+	font: inherit;
+	cursor: pointer;
+	border-radius: 3px;
+}
+.aaa-report-trigger:hover {
+	background: #f6f7f7;
+	border-color: #2271b1;
+}
+.aaa-report-popover {
+	min-width: 380px;
+	min-height: auto;
+}
+.aaa-report-popover .aaa-report-input {
+	width: 100%;
+	margin-top: 4px;
+}
+.aaa-report-popover .aaa-report-status {
+	min-height: 1.2em;
+	margin: 8px 0;
+}
 .aaa-option-optimizer-tabs {
 	clear: both;
 	display: flex;

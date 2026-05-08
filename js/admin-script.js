@@ -183,7 +183,11 @@ jQuery( document ).ready( function () {
 				className: 'select-all',
 			},
 			{ name: 'name', data: 'name' },
-			{ name: 'source', data: 'plugin' },
+			{
+				name: 'source',
+				data: 'plugin',
+				render: ( data, type, row ) => renderSourceColumn( row ),
+			},
 			{ name: 'size', data: 'size', searchable: false },
 			{
 				name: 'autoload',
@@ -204,7 +208,12 @@ jQuery( document ).ready( function () {
 		if ( selector === '#requested_do_not_exist_table' ) {
 			return [
 				{ name: 'option', data: 'name' },
-				{ name: 'source', data: 'plugin', searchable: false },
+				{
+					name: 'source',
+					data: 'plugin',
+					searchable: false,
+					render: ( data, type, row ) => renderSourceColumn( row ),
+				},
 				{ name: 'calls', data: 'count', searchable: false },
 				{
 					name: 'option_name',
@@ -227,7 +236,11 @@ jQuery( document ).ready( function () {
 					className: 'select-all',
 				},
 				{ name: 'name', data: 'name' },
-				{ name: 'source', data: 'plugin' },
+				{
+					name: 'source',
+					data: 'plugin',
+					render: ( data, type, row ) => renderSourceColumn( row ),
+				},
 				{ name: 'size', data: 'size', searchable: false },
 				{
 					name: 'autoload',
@@ -257,7 +270,11 @@ jQuery( document ).ready( function () {
 					className: 'select-all',
 				},
 				{ name: 'name', data: 'name' },
-				{ name: 'source', data: 'plugin' },
+				{
+					name: 'source',
+					data: 'plugin',
+					render: ( data, type, row ) => renderSourceColumn( row ),
+				},
 				{
 					name: 'size',
 					data: 'size',
@@ -382,6 +399,220 @@ jQuery( document ).ready( function () {
 				<input type="checkbox" id="select-option-${ row.name }" class="select-option" data-option="${ row.name }">
 			</label>`;
 	}
+
+	/**
+	 * Escape HTML for safe insertion as text.
+	 *
+	 * @param {string} unsafe - The string to escape.
+	 * @return {string} - The escaped string.
+	 */
+	function escapeHtml( unsafe ) {
+		return String( unsafe )
+			.replace( /&/g, '&amp;' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' )
+			.replace( /"/g, '&quot;' )
+			.replace( /'/g, '&#039;' );
+	}
+
+	/**
+	 * Renders the Source column. For unknown sources, wraps the label
+	 * in a button that opens a Report Origin popover.
+	 *
+	 * @param {Object} row - The row data.
+	 *
+	 * @return {string} - The HTML for the source column.
+	 */
+	function renderSourceColumn( row ) {
+		const label = escapeHtml( row.plugin );
+		if ( row.plugin_known ) {
+			return label;
+		}
+		const popoverId = `report_${ row.name.replace(
+			/[^a-zA-Z0-9_-]/g,
+			'_'
+		) }`;
+		return `${ renderReportPopover( row, popoverId ) }
+			<button type="button" class="aaa-report-trigger" popovertarget="${ popoverId }" data-option="${ escapeHtml(
+				row.name
+			) }">
+				${ label } &mdash; ${ aaaOptionOptimizer.i18n.reportOrigin }?
+			</button>`;
+	}
+
+	/**
+	 * Renders the Report Origin popover for an unknown row.
+	 *
+	 * @param {Object} row       - The row data.
+	 * @param {string} popoverId - The popover element id.
+	 *
+	 * @return {string} - The popover HTML.
+	 */
+	function renderReportPopover( row, popoverId ) {
+		const i18n = aaaOptionOptimizer.i18n;
+		const optionName = escapeHtml( row.name );
+		return `<div id="${ popoverId }" popover class="aaa-option-optimizer-popover aaa-report-popover" data-option="${ optionName }">
+			<button type="button" class="aaa-option-optimizer-popover__close" popovertarget="${ popoverId }" popovertargetaction="hide">X</button>
+			<p><strong>${ i18n.reportOriginOf } <code>${ optionName }</code></strong></p>
+			<p>
+				<label>
+					${ i18n.reportSlugOrUrlLabel }
+					<input type="text" class="aaa-report-input regular-text" placeholder="${ escapeHtml(
+						i18n.reportSlugPlaceholder
+					) }" autocomplete="off" />
+				</label>
+			</p>
+			<p class="aaa-report-status" aria-live="polite"></p>
+			<p class="description">${ escapeHtml( i18n.reportPrivacyNote ) }</p>
+			<p>
+				<button type="button" class="button aaa-report-cancel" popovertarget="${ popoverId }" popovertargetaction="hide">${
+					i18n.reportCancel
+				}</button>
+				<button type="button" class="button button-primary aaa-report-submit" disabled>${
+					i18n.reportSubmit
+				}</button>
+			</p>
+		</div>`;
+	}
+
+	/**
+	 * Extract a wp.org plugin slug from a slug or URL.
+	 *
+	 * @param {string} input - User input.
+	 * @return {string} - Normalized slug, or empty string if invalid.
+	 */
+	function normalizeSlug( input ) {
+		const trimmed = String( input || '' ).trim();
+		if ( ! trimmed ) {
+			return '';
+		}
+		// Try to pull a slug out of a wordpress.org URL.
+		const urlMatch = trimmed.match(
+			/wordpress\.org\/plugins\/([a-z0-9-]+)/i
+		);
+		if ( urlMatch ) {
+			return urlMatch[ 1 ].toLowerCase();
+		}
+		// Otherwise treat input as a slug.
+		if ( /^[a-z0-9-]+$/i.test( trimmed ) ) {
+			return trimmed.toLowerCase();
+		}
+		return '';
+	}
+
+	// Per-popover state for the wp.org verification step.
+	const reportState = {};
+
+	/**
+	 * Verify a slug against the wordpress.org plugin directory and update
+	 * the popover UI accordingly.
+	 *
+	 * @param {jQuery} $popover - The popover jQuery element.
+	 * @param {string} slug     - The slug to verify.
+	 */
+	function verifyReportSlug( $popover, slug ) {
+		const optionName = $popover.data( 'option' );
+		const i18n = aaaOptionOptimizer.i18n;
+		const $status = $popover.find( '.aaa-report-status' );
+		const $submit = $popover.find( '.aaa-report-submit' );
+
+		reportState[ optionName ] = { slug: '', verifiedName: '' };
+		$submit.prop( 'disabled', true );
+
+		if ( ! slug ) {
+			$status.text( '' );
+			return;
+		}
+
+		$status.text( i18n.reportVerifying );
+
+		jQuery
+			.ajax( {
+				url: `https://api.wordpress.org/plugins/info/1.0/${ encodeURIComponent(
+					slug
+				) }.json`,
+				method: 'GET',
+				dataType: 'json',
+				timeout: 8000,
+			} )
+			.done( function ( data ) {
+				if ( ! data || data.error || ! data.name ) {
+					$status.text( i18n.reportNotFound );
+					return;
+				}
+				reportState[ optionName ] = {
+					slug,
+					verifiedName: data.name,
+				};
+				$status.html(
+					`✓ ${ i18n.reportVerified } <strong>${ escapeHtml(
+						data.name
+					) }</strong>`
+				);
+				$submit.prop( 'disabled', false );
+			} )
+			.fail( function () {
+				$status.text( i18n.reportVerifyError );
+			} );
+	}
+
+	/**
+	 * Submit a report to the configured endpoint.
+	 *
+	 * @param {jQuery} $popover - The popover jQuery element.
+	 */
+	function submitReport( $popover ) {
+		const optionName = $popover.data( 'option' );
+		const i18n = aaaOptionOptimizer.i18n;
+		const state = reportState[ optionName ];
+		if ( ! state || ! state.slug ) {
+			return;
+		}
+
+		const $status = $popover.find( '.aaa-report-status' );
+		const $submit = $popover.find( '.aaa-report-submit' );
+		$submit.prop( 'disabled', true );
+		$status.text( i18n.reportSubmitting );
+
+		jQuery
+			.ajax( {
+				url: aaaOptionOptimizer.reportUrl,
+				method: 'POST',
+				contentType: 'application/json',
+				data: JSON.stringify( {
+					option_name: optionName,
+					slug: state.slug,
+					site: window.location.hostname,
+				} ),
+				timeout: 10000,
+			} )
+			.done( function () {
+				$status.text( i18n.reportThanks );
+			} )
+			.fail( function () {
+				$status.text( i18n.reportFailed );
+				$submit.prop( 'disabled', false );
+			} );
+	}
+
+	// Debounced wp.org verification on input change.
+	let reportInputTimer = null;
+	jQuery( document ).on( 'input', '.aaa-report-input', function () {
+		const $popover = jQuery( this ).closest( '.aaa-report-popover' );
+		const raw = jQuery( this ).val();
+		const slug = normalizeSlug( raw );
+		clearTimeout( reportInputTimer );
+		reportInputTimer = setTimeout(
+			() => verifyReportSlug( $popover, slug ),
+			350
+		);
+	} );
+
+	// Submit handler.
+	jQuery( document ).on( 'click', '.aaa-report-submit', function () {
+		const $popover = jQuery( this ).closest( '.aaa-report-popover' );
+		submitReport( $popover );
+	} );
 
 	jQuery( '#aaa-option-reset-data' ).on( 'click', function ( e ) {
 		e.preventDefault();
@@ -651,8 +882,7 @@ jQuery( document ).ready( function () {
 		function migrateChunk() {
 			jQuery.ajax( {
 				url:
-					aaaOptionOptimizer.root +
-					'aaa-option-optimizer/v1/migrate',
+					aaaOptionOptimizer.root + 'aaa-option-optimizer/v1/migrate',
 				method: 'POST',
 				beforeSend: ( xhr ) =>
 					xhr.setRequestHeader(

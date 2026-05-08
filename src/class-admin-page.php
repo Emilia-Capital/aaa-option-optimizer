@@ -185,6 +185,13 @@ class Admin_Page {
 			true // In footer.
 		);
 
+		/**
+		 * Filter the URL the plugin POSTs unknown-option reports to.
+		 *
+		 * @param string $url The submission endpoint URL.
+		 */
+		$report_url = \apply_filters( 'aaa_option_optimizer_report_url', 'https://option-optimizer-api.progressplanner.com/submit' );
+
 		\wp_localize_script(
 			'aaa-option-optimizer-admin-js',
 			'aaaOptionOptimizer',
@@ -192,6 +199,7 @@ class Admin_Page {
 				'root'      => \esc_url_raw( \rest_url() ),
 				'nonce'     => \wp_create_nonce( 'wp_rest' ),
 				'migration' => Database::get_migration_status(),
+				'reportUrl' => \esc_url_raw( $report_url ),
 				'i18n'      => [
 					'filterBySource'         => \esc_html__( 'Filter by source', 'aaa-option-optimizer' ),
 					'showValue'              => \esc_html__( 'Show', 'aaa-option-optimizer' ),
@@ -199,6 +207,21 @@ class Admin_Page {
 					'removeAutoload'         => \esc_html__( 'Remove autoload', 'aaa-option-optimizer' ),
 					'deleteOption'           => \esc_html__( 'Delete', 'aaa-option-optimizer' ),
 					'createOptionFalse'      => \esc_html__( 'Create option with value false', 'aaa-option-optimizer' ),
+					'unknownLabel'           => \esc_html__( 'Unknown', 'aaa-option-optimizer' ),
+					'reportOrigin'           => \esc_html__( 'Report origin', 'aaa-option-optimizer' ),
+					'reportOriginOf'         => \esc_html__( 'Report origin of', 'aaa-option-optimizer' ),
+					'reportSlugOrUrlLabel'   => \esc_html__( 'wp.org slug or URL', 'aaa-option-optimizer' ),
+					'reportSlugPlaceholder'  => \esc_html__( 'e.g. wp125 or https://wordpress.org/plugins/wp125/', 'aaa-option-optimizer' ),
+					'reportVerifying'        => \esc_html__( 'Checking wp.org…', 'aaa-option-optimizer' ),
+					'reportNotFound'         => \esc_html__( 'Plugin not found on wordpress.org.', 'aaa-option-optimizer' ),
+					'reportVerifyError'      => \esc_html__( 'Could not verify with wordpress.org.', 'aaa-option-optimizer' ),
+					'reportVerified'         => \esc_html__( 'Verified:', 'aaa-option-optimizer' ),
+					'reportSubmit'           => \esc_html__( 'Submit', 'aaa-option-optimizer' ),
+					'reportCancel'           => \esc_html__( 'Cancel', 'aaa-option-optimizer' ),
+					'reportSubmitting'       => \esc_html__( 'Submitting…', 'aaa-option-optimizer' ),
+					'reportThanks'           => \esc_html__( 'Thanks! Your report has been submitted.', 'aaa-option-optimizer' ),
+					'reportFailed'           => \esc_html__( 'Submission failed. Please try again.', 'aaa-option-optimizer' ),
+					'reportPrivacyNote'      => \esc_html__( 'We send the option name and the slug you provide. Never the option value.', 'aaa-option-optimizer' ),
 					'noAutoloadedButNotUsed' => \esc_html__( 'All autoloaded options are in use.', 'aaa-option-optimizer' ),
 					'noUsedButNotAutoloaded' => \esc_html__( 'All options that are used are autoloaded.', 'aaa-option-optimizer' ),
 					'noOptionsSelected'      => \esc_html__( 'No options selected.', 'aaa-option-optimizer' ),

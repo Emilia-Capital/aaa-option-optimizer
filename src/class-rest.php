@@ -228,12 +228,13 @@ class REST {
 		$options = $wpdb->get_results( "SELECT option_name, option_value, autoload FROM $wpdb->options" );
 		foreach ( $options as $option ) {
 			$output[] = [
-				'name'     => $option->option_name,
-				'plugin'   => $this->get_plugin_name( $option->option_name ),
-				'value'    => htmlentities( $option->option_value, ENT_QUOTES | ENT_SUBSTITUTE ),
-				'size'     => $this->get_length( $option->option_value ),
-				'raw_size' => strlen( $option->option_value ),
-				'autoload' => $option->autoload,
+				'name'         => $option->option_name,
+				'plugin'       => $this->get_plugin_name( $option->option_name ),
+				'plugin_known' => $this->is_plugin_known( $option->option_name ),
+				'value'        => htmlentities( $option->option_value, ENT_QUOTES | ENT_SUBSTITUTE ),
+				'size'         => $this->get_length( $option->option_value ),
+				'raw_size'     => strlen( $option->option_value ),
+				'autoload'     => $option->autoload,
 			];
 		}
 		return new \WP_REST_Response( [ 'data' => $output ], 200 );
@@ -320,12 +321,13 @@ class REST {
 			// Format output.
 			foreach ( $results as $row ) {
 				$response_data[] = [
-					'name'     => $row->option_name,
-					'plugin'   => $this->get_plugin_name( $row->option_name ),
-					'value'    => htmlentities( $row->option_value, ENT_QUOTES | ENT_SUBSTITUTE ),
-					'size'     => $this->get_length( $row->option_value ),
-					'raw_size' => strlen( $row->option_value ),
-					'autoload' => 'yes',
+					'name'         => $row->option_name,
+					'plugin'       => $this->get_plugin_name( $row->option_name ),
+					'plugin_known' => $this->is_plugin_known( $row->option_name ),
+					'value'        => htmlentities( $row->option_value, ENT_QUOTES | ENT_SUBSTITUTE ),
+					'size'         => $this->get_length( $row->option_value ),
+					'raw_size'     => strlen( $row->option_value ),
+					'autoload'     => 'yes',
 				];
 			}
 
@@ -459,13 +461,14 @@ class REST {
 
 		foreach ( $results as $row ) {
 			$response_data[] = [
-				'name'     => $row->option_name,
-				'plugin'   => $this->get_plugin_name( $row->option_name ),
-				'value'    => htmlentities( maybe_serialize( $row->option_value ), ENT_QUOTES | ENT_SUBSTITUTE ),
-				'size'     => $this->get_length( $row->option_value ),
-				'raw_size' => strlen( $row->option_value ),
-				'autoload' => 'no',
-				'count'    => $used_options[ $row->option_name ] ?? 0,
+				'name'         => $row->option_name,
+				'plugin'       => $this->get_plugin_name( $row->option_name ),
+				'plugin_known' => $this->is_plugin_known( $row->option_name ),
+				'value'        => htmlentities( maybe_serialize( $row->option_value ), ENT_QUOTES | ENT_SUBSTITUTE ),
+				'size'         => $this->get_length( $row->option_value ),
+				'raw_size'     => strlen( $row->option_value ),
+				'autoload'     => 'no',
+				'count'        => $used_options[ $row->option_name ] ?? 0,
 			];
 		}
 
@@ -560,10 +563,11 @@ class REST {
 		foreach ( $non_autoloaded_keys as $option => $count ) {
 			if ( ! isset( $existing_keys[ $option ] ) ) {
 				$non_existing_options[ $option ] = [
-					'name'        => $option,
-					'plugin'      => $this->get_plugin_name( $option ),
-					'count'       => $count,
-					'option_name' => $option,
+					'name'         => $option,
+					'plugin'       => $this->get_plugin_name( $option ),
+					'plugin_known' => $this->is_plugin_known( $option ),
+					'count'        => $count,
+					'option_name'  => $option,
 				];
 			}
 		}
@@ -864,6 +868,17 @@ class REST {
 	 */
 	private function get_plugin_name( $option ) {
 		return $this->map_plugin_to_options->get_plugin_name( $option );
+	}
+
+	/**
+	 * Whether the option's source plugin is known.
+	 *
+	 * @param string $option The option name.
+	 *
+	 * @return bool
+	 */
+	private function is_plugin_known( $option ) {
+		return $this->map_plugin_to_options->is_known( $option );
 	}
 
 	/**
