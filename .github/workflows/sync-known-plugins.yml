@@ -5,7 +5,6 @@ on:
     - cron: '0 3 * * *'
   push:
     branches:
-      - develop
       - main
     paths:
       - 'known-plugins/known-plugins.json'
@@ -16,8 +15,10 @@ jobs:
     name: Publish known-plugins.json to wp.org assets
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (main only)
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
