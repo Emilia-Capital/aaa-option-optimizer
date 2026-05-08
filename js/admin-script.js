@@ -423,15 +423,13 @@ jQuery( document ).ready( function () {
 	 *
 	 * @return {string} - The HTML for the source column.
 	 */
+	let reportPopoverSeq = 0;
 	function renderSourceColumn( row ) {
 		const label = escapeHtml( row.plugin );
 		if ( row.plugin_known ) {
 			return label;
 		}
-		const popoverId = `report_${ row.name.replace(
-			/[^a-zA-Z0-9_-]/g,
-			'_'
-		) }`;
+		const popoverId = `aaa_report_${ ++reportPopoverSeq }`;
 		return `${ renderReportPopover( row, popoverId ) }
 			<button type="button" class="aaa-report-trigger" popovertarget="${ popoverId }" data-option="${ escapeHtml(
 				row.name
@@ -595,16 +593,19 @@ jQuery( document ).ready( function () {
 			} );
 	}
 
-	// Debounced wp.org verification on input change.
-	let reportInputTimer = null;
+	// Debounced wp.org verification on input change. Per-popover timer so
+	// concurrently-open popovers don't cancel each other's verification.
 	jQuery( document ).on( 'input', '.aaa-report-input', function () {
 		const $popover = jQuery( this ).closest( '.aaa-report-popover' );
 		const raw = jQuery( this ).val();
 		const slug = normalizeSlug( raw );
-		clearTimeout( reportInputTimer );
-		reportInputTimer = setTimeout(
-			() => verifyReportSlug( $popover, slug ),
-			350
+		const previous = $popover.data( 'verifyTimer' );
+		if ( previous ) {
+			clearTimeout( previous );
+		}
+		$popover.data(
+			'verifyTimer',
+			setTimeout( () => verifyReportSlug( $popover, slug ), 350 )
 		);
 	} );
 

@@ -43,12 +43,11 @@ jobs:
             --non-interactive \
             --no-auth-cache \
             https://plugins.svn.wordpress.org/aaa-option-optimizer/ svn-repo
-          svn update --set-depth infinity svn-repo/assets || svn mkdir --parents svn-repo/assets
+          svn update --set-depth infinity svn-repo/assets
 
       - name: Copy JSON into assets and detect changes
         id: diff
         run: |
-          mkdir -p svn-repo/assets
           cp known-plugins/known-plugins.json svn-repo/assets/known-plugins.json
           cd svn-repo
           # Add the file if it's new
