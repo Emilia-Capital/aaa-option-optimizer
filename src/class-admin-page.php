@@ -240,6 +240,8 @@ class Admin_Page {
 					'restore'                => \esc_html__( 'Restore', 'aaa-option-optimizer' ),
 					'permanentlyDelete'      => \esc_html__( 'Permanently delete', 'aaa-option-optimizer' ),
 					'confirmPermanentDelete' => \esc_html__( 'Permanently delete this option? This cannot be undone.', 'aaa-option-optimizer' ),
+					/* translators: %d: number of selected options */
+					'confirmBulkQuarantine'  => \esc_html__( 'You are about to quarantine %d options. They can be restored from the Quarantine tab. Continue?', 'aaa-option-optimizer' ),
 					'importSelectFile'       => \esc_html__( 'Select JSON file', 'aaa-option-optimizer' ),
 					'importOverwriteLabel'   => \esc_html__( 'Overwrite existing options', 'aaa-option-optimizer' ),
 					'importButton'           => \esc_html__( 'Import', 'aaa-option-optimizer' ),

@@ -18,11 +18,6 @@ class Quarantine {
 	const CRON_HOOK = 'aaa_option_optimizer_quarantine_cleanup';
 
 	/**
-	 * Hard cap on simultaneously quarantined options.
-	 */
-	const MAX_ROWS = 50;
-
-	/**
 	 * Default retention in days.
 	 */
 	const DEFAULT_RETENTION_DAYS = 7;
@@ -65,18 +60,6 @@ class Quarantine {
 					$option_name
 				),
 				[ 'status' => 403 ]
-			);
-		}
-
-		if ( Database::count_quarantine_rows() >= self::MAX_ROWS ) {
-			return new \WP_Error(
-				'quarantine_full',
-				\sprintf(
-					/* translators: %d: max quarantine rows */
-					\__( 'Quarantine is full (max %d options). Restore or permanently delete some entries first.', 'aaa-option-optimizer' ),
-					self::MAX_ROWS
-				),
-				[ 'status' => 409 ]
 			);
 		}
 

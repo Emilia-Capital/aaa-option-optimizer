@@ -779,6 +779,19 @@ jQuery( document ).ready( function () {
 				return;
 			}
 
+			// Warn before quarantining a large batch — quarantine is recoverable
+			// but sifting through hundreds of rows to find a culprit is painful.
+			if ( bulkAction === 'delete' && requestData.option_names.length > 25 ) {
+				const msg = aaaOptionOptimizer.i18n.confirmBulkQuarantine.replace(
+					'%d',
+					requestData.option_names.length
+				);
+				// eslint-disable-next-line no-alert
+				if ( ! window.confirm( msg ) ) {
+					return;
+				}
+			}
+
 			const endpoint =
 				'delete' === bulkAction
 					? 'delete-options'
