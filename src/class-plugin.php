@@ -167,7 +167,7 @@ class Plugin {
 	}
 
 	/**
-	 * Refresh the cached known-plugins mapping from wp.org.
+	 * Refresh the cached known-plugins mapping from the maintainers' server.
 	 *
 	 * @return void
 	 */

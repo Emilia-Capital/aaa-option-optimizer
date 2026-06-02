@@ -56,15 +56,15 @@ Please do a pull request via GitHub on [this file](https://github.com/ProgressPl
 
 This plugin connects to two external services to identify the source plugins of WordPress options.
 
-= WordPress.org plugin directory (api.wordpress.org and ps.w.org) =
-
-Once a day, the plugin fetches an updated list of recognized plugins from `https://ps.w.org/aaa-option-optimizer/assets/known-plugins.json`. This lets the plugin identify newly-added plugins as the maintained list grows, without requiring a plugin update. Only the JSON file is requested; no data is sent.
+= WordPress.org plugin directory (api.wordpress.org) =
 
 When you click "Report" on an option whose source is "Unknown" and type a plugin slug, the plugin queries `https://api.wordpress.org/plugins/info/1.0/{slug}.json` to verify the slug exists and to display the official plugin name for confirmation. Only the slug you type is sent.
 
 WordPress.org terms of service: https://wordpress.org/about/privacy/
 
-= Origin reporting endpoint (option-optimizer-api.progressplanner.com) =
+= Known-plugins mapping and origin reporting (option-optimizer-api.progressplanner.com) =
+
+Once a day, the plugin fetches an updated list of recognized plugins from `https://option-optimizer-api.progressplanner.com/known-plugins.json`. This lets the plugin identify newly-added plugins as the maintained list grows, without requiring a plugin update. With this request the plugin sends your plugin version and WordPress version, so the maintainers can keep anonymous usage statistics. No site identity is sent. The fetch URL can be overridden, or the feature disabled, via the `aaa_option_optimizer_known_plugins_url` filter.
 
 When you submit a "Report origin" form, the plugin sends the option name you reported, the wp.org plugin slug you supplied, and your site's hostname to `https://option-optimizer-api.progressplanner.com/submit`. The submission is recorded as a GitHub issue for a maintainer to review and add to the recognized plugins list. The site hostname is hashed before storage and never published. The option name and slug appear in the public GitHub issue. Submissions only happen when you click Submit on the Report form; nothing is sent automatically.
 

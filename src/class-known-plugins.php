@@ -10,13 +10,13 @@ namespace Progress_Planner\OptionOptimizer;
 /**
  * Class Known_Plugins
  *
- * Fetches the latest known-plugins.json from wp.org and caches it locally.
- * Falls back to the JSON file bundled with the plugin when no fresh remote
- * copy is available.
+ * Fetches the latest known-plugins mapping from the plugin maintainers' server
+ * and caches it locally. Falls back to the JSON file bundled with the plugin
+ * when no fresh remote copy is available.
  */
 class Known_Plugins {
 
-	const REMOTE_URL = 'https://ps.w.org/aaa-option-optimizer/assets/known-plugins.json';
+	const REMOTE_URL = 'https://option-optimizer-api.progressplanner.com/known-plugins.json';
 	const CACHE_KEY  = 'aaa_option_optimizer_known_plugins';
 	const CRON_HOOK  = 'aaa_option_optimizer_refresh_known_plugins';
 
@@ -50,13 +50,28 @@ class Known_Plugins {
 	/**
 	 * Refresh the cached mapping from the remote URL.
 	 *
+	 * Sends the plugin and WordPress versions so the maintainers can keep
+	 * anonymous usage statistics for the maintained mapping. No site identity
+	 * is transmitted.
+	 *
 	 * @return bool True when a fresh copy was stored, false otherwise.
 	 */
 	public function refresh(): bool {
-		$response = \wp_remote_get(
-			self::REMOTE_URL,
+		/**
+		 * Filters the URL the known-plugins mapping is fetched from.
+		 *
+		 * Allows users to redirect or disable the remote fetch.
+		 *
+		 * @param string $url The remote URL.
+		 */
+		$url = \apply_filters( 'aaa_option_optimizer_known_plugins_url', self::REMOTE_URL );
+
+		$response = \wp_remote_post(
+			$url,
 			[
 				'timeout' => 10,
+				'headers' => [ 'Content-Type' => 'application/json' ],
+				'body'    => (string) \wp_json_encode( $this->stats_payload() ),
 			]
 		);
 
@@ -78,6 +93,26 @@ class Known_Plugins {
 		\update_option( self::CACHE_KEY, $data, false );
 		$this->list = $data;
 		return true;
+	}
+
+	/**
+	 * Build the anonymous stats payload sent with the refresh request.
+	 *
+	 * @return array<string, string>
+	 */
+	private function stats_payload(): array {
+		global $wp_version;
+
+		$plugin_version = '';
+		if ( \function_exists( 'get_file_data' ) ) {
+			$data           = \get_file_data( AAA_OPTION_OPTIMIZER_FILE, [ 'Version' => 'Version' ] );
+			$plugin_version = isset( $data['Version'] ) ? (string) $data['Version'] : '';
+		}
+
+		return [
+			'plugin_version' => $plugin_version,
+			'wp_version'     => (string) $wp_version,
+		];
 	}
 
 	/**
