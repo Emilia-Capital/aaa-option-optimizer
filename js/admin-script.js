@@ -462,6 +462,7 @@ jQuery( document ).ready( function () {
 			</p>
 			<p class="aaa-report-status" aria-live="polite"></p>
 			<p class="description">${ escapeHtml( i18n.reportPrivacyNote ) }</p>
+			${ renderConsentField() }
 			<p>
 				<button type="button" class="button aaa-report-cancel" popovertarget="${ popoverId }" popovertargetaction="hide">${
 					i18n.reportCancel
@@ -471,6 +472,53 @@ jQuery( document ).ready( function () {
 				}</button>
 			</p>
 		</div>`;
+	}
+
+	/**
+	 * Renders the consent checkbox shown in the Report popover when the user
+	 * has not yet consented to contacting our servers. Returns an empty string
+	 * once consent has been granted (globally or earlier this session).
+	 *
+	 * @return {string} - The consent field HTML, or an empty string.
+	 */
+	function renderConsentField() {
+		if ( aaaOptionOptimizer.hasRemoteConsent ) {
+			return '';
+		}
+		return `<p class="aaa-report-consent">
+			<label>
+				<input type="checkbox" class="aaa-report-consent-input" />
+				${ escapeHtml( aaaOptionOptimizer.i18n.reportConsentLabel ) }
+			</label>
+		</p>`;
+	}
+
+	/**
+	 * Whether the report in this popover may be submitted: a slug must be
+	 * verified, and consent must be granted (globally or via the popover
+	 * checkbox).
+	 *
+	 * @param {jQuery} $popover - The popover jQuery element.
+	 * @return {boolean} - True when the report may be submitted.
+	 */
+	function reportCanSubmit( $popover ) {
+		const optionName = $popover.data( 'option' );
+		const state = reportState[ optionName ];
+		const verified = !! ( state && state.slug && state.verifiedName );
+		return verified && hasReportConsent( $popover );
+	}
+
+	/**
+	 * Whether consent is satisfied for this popover.
+	 *
+	 * @param {jQuery} $popover - The popover jQuery element.
+	 * @return {boolean} - True when consent is satisfied.
+	 */
+	function hasReportConsent( $popover ) {
+		if ( aaaOptionOptimizer.hasRemoteConsent ) {
+			return true;
+		}
+		return $popover.find( '.aaa-report-consent-input' ).is( ':checked' );
 	}
 
 	/**
@@ -547,7 +595,7 @@ jQuery( document ).ready( function () {
 						data.name
 					) }</strong>`
 				);
-				$submit.prop( 'disabled', false );
+				$submit.prop( 'disabled', ! reportCanSubmit( $popover ) );
 			} )
 			.fail( function () {
 				$status.text( i18n.reportVerifyError );
@@ -566,11 +614,20 @@ jQuery( document ).ready( function () {
 		if ( ! state || ! state.slug ) {
 			return;
 		}
+		if ( ! hasReportConsent( $popover ) ) {
+			return;
+		}
 
 		const $status = $popover.find( '.aaa-report-status' );
 		const $submit = $popover.find( '.aaa-report-submit' );
 		$submit.prop( 'disabled', true );
 		$status.text( i18n.reportSubmitting );
+
+		// If consent was granted here (not previously), persist it so the daily
+		// refresh starts and the user isn't asked again.
+		if ( ! aaaOptionOptimizer.hasRemoteConsent ) {
+			persistConsent();
+		}
 
 		jQuery
 			.ajax( {
@@ -593,6 +650,23 @@ jQuery( document ).ready( function () {
 			} );
 	}
 
+	/**
+	 * Persist the user's consent to contacting our servers, and remember it for
+	 * the rest of this page session so further popovers don't ask again. Best
+	 * effort — a failure here doesn't block the report the user just made.
+	 */
+	function persistConsent() {
+		aaaOptionOptimizer.hasRemoteConsent = true;
+		jQuery.ajax( {
+			url: `${ aaaOptionOptimizer.root }aaa-option-optimizer/v1/set-consent`,
+			method: 'POST',
+			contentType: 'application/json',
+			beforeSend: ( xhr ) =>
+				xhr.setRequestHeader( 'X-WP-Nonce', aaaOptionOptimizer.nonce ),
+			data: JSON.stringify( { consent: true } ),
+		} );
+	}
+
 	// Debounced wp.org verification on input change. Per-popover timer so
 	// concurrently-open popovers don't cancel each other's verification.
 	jQuery( document ).on( 'input', '.aaa-report-input', function () {
@@ -607,6 +681,14 @@ jQuery( document ).ready( function () {
 			'verifyTimer',
 			setTimeout( () => verifyReportSlug( $popover, slug ), 350 )
 		);
+	} );
+
+	// Re-evaluate the submit button when consent is toggled.
+	jQuery( document ).on( 'change', '.aaa-report-consent-input', function () {
+		const $popover = jQuery( this ).closest( '.aaa-report-popover' );
+		$popover
+			.find( '.aaa-report-submit' )
+			.prop( 'disabled', ! reportCanSubmit( $popover ) );
 	} );
 
 	// Submit handler.

@@ -64,7 +64,7 @@ WordPress.org terms of service: https://wordpress.org/about/privacy/
 
 = Known-plugins mapping and origin reporting (option-optimizer-api.progressplanner.com) =
 
-Once a day, the plugin fetches an updated list of recognized plugins from `https://option-optimizer-api.progressplanner.com/known-plugins.json`. This lets the plugin identify newly-added plugins as the maintained list grows, without requiring a plugin update. With this request the plugin sends your plugin version and WordPress version, so the maintainers can keep anonymous usage statistics. No site identity is sent. The fetch URL can be overridden, or the feature disabled, via the `aaa_option_optimizer_known_plugins_url` filter.
+**This is off until you opt in.** Once you enable "Keep the known-plugins list up to date automatically" (on the plugin's settings tab, or by agreeing in the Report popover), the plugin fetches an updated list of recognized plugins once a day from `https://option-optimizer-api.progressplanner.com/known-plugins.json`. This lets the plugin identify newly-added plugins as the maintained list grows, without requiring a plugin update. With this request the plugin sends your plugin version and WordPress version, so the maintainers can keep anonymous usage statistics. No site identity is sent. Until you opt in, only the list bundled with the plugin is used and no request is made. The fetch URL can be overridden, or the feature disabled, via the `aaa_option_optimizer_known_plugins_url` filter.
 
 When you submit a "Report origin" form, the plugin sends the option name you reported, the wp.org plugin slug you supplied, and your site's hostname to `https://option-optimizer-api.progressplanner.com/submit`. The submission is recorded as a GitHub issue for a maintainer to review and add to the recognized plugins list. The site hostname is hashed before storage and never published. The option name and slug appear in the public GitHub issue. Submissions only happen when you click Submit on the Report form; nothing is sent automatically.
 
@@ -75,7 +75,7 @@ The endpoint is operated by the plugin maintainers. The submission URL can be ov
 = 1.7.0 =
 
 * Add "Report origin" feature: for options whose source plugin is unknown, users can submit the matching wp.org slug to help maintainers expand the recognized plugins list. Submissions land as GitHub issues for maintainer review; no auto-merge.
-* Recognized-plugins list now refreshes from wp.org once a day in the background, so the list grows for users without requiring plugin updates.
+* Recognized-plugins list can refresh once a day in the background from the maintainers' server, so the list grows for users without requiring plugin updates. This is opt-in: enable it on the settings tab or agree in the Report popover. The refresh sends only your plugin and WordPress version for anonymous statistics; no site identity is sent.
 
 = 1.6.1 =
 

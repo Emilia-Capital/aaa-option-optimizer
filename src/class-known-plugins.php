@@ -21,6 +21,19 @@ class Known_Plugins {
 	const CRON_HOOK  = 'aaa_option_optimizer_refresh_known_plugins';
 
 	/**
+	 * Whether the user has consented to contacting our servers.
+	 *
+	 * Gates the daily remote refresh (which fetches the mapping and sends the
+	 * plugin + WordPress version for anonymous stats). Off until the user opts
+	 * in, either on the settings page or via the Report popover.
+	 *
+	 * @return bool
+	 */
+	public static function has_consent(): bool {
+		return (bool) Admin_Page::get_settings()['remote_data_consent'];
+	}
+
+	/**
 	 * In-memory cache for the current request.
 	 *
 	 * @var array<string, array<string, mixed>>|null
@@ -57,6 +70,11 @@ class Known_Plugins {
 	 * @return bool True when a fresh copy was stored, false otherwise.
 	 */
 	public function refresh(): bool {
+		// Never contact our servers without the user's consent.
+		if ( ! self::has_consent() ) {
+			return false;
+		}
+
 		/**
 		 * Filters the URL the known-plugins mapping is fetched from.
 		 *

@@ -73,6 +73,11 @@ class Admin_Page {
 		}
 		$existing['settings']['option_tracking'] = $option_tracking;
 
+		// Consent to contacting our servers (checkbox: present means granted).
+		$existing['settings']['remote_data_consent'] = isset( $input['settings']['remote_data_consent'] )
+			? (bool) $input['settings']['remote_data_consent']
+			: false;
+
 		// Return the full option structure with merged settings.
 		return $existing;
 	}
@@ -84,7 +89,8 @@ class Admin_Page {
 	 */
 	public static function get_settings(): array {
 		$defaults = [
-			'option_tracking' => 'pre_option',
+			'option_tracking'     => 'pre_option',
+			'remote_data_consent' => false,
 		];
 
 		$option_optimizer = \get_option( self::OPTION_NAME, [] );
@@ -196,11 +202,12 @@ class Admin_Page {
 			'aaa-option-optimizer-admin-js',
 			'aaaOptionOptimizer',
 			[
-				'root'      => \esc_url_raw( \rest_url() ),
-				'nonce'     => \wp_create_nonce( 'wp_rest' ),
-				'migration' => Database::get_migration_status(),
-				'reportUrl' => \esc_url_raw( $report_url ),
-				'i18n'      => [
+				'root'             => \esc_url_raw( \rest_url() ),
+				'nonce'            => \wp_create_nonce( 'wp_rest' ),
+				'migration'        => Database::get_migration_status(),
+				'reportUrl'        => \esc_url_raw( $report_url ),
+				'hasRemoteConsent' => Known_Plugins::has_consent(),
+				'i18n'             => [
 					'filterBySource'         => \esc_html__( 'Filter by source', 'aaa-option-optimizer' ),
 					'showValue'              => \esc_html__( 'Show', 'aaa-option-optimizer' ),
 					'addAutoload'            => \esc_html__( 'Add autoload', 'aaa-option-optimizer' ),
@@ -222,6 +229,7 @@ class Admin_Page {
 					'reportThanks'           => \esc_html__( 'Thanks! Your report has been submitted.', 'aaa-option-optimizer' ),
 					'reportFailed'           => \esc_html__( 'Submission failed. Please try again.', 'aaa-option-optimizer' ),
 					'reportPrivacyNote'      => \esc_html__( 'We send the option name and the slug you provide. Never the option value.', 'aaa-option-optimizer' ),
+					'reportConsentLabel'     => \esc_html__( 'I agree to send this report to option-optimizer-api.progressplanner.com, and to let the plugin keep the known-plugins list up to date daily.', 'aaa-option-optimizer' ),
 					'noAutoloadedButNotUsed' => \esc_html__( 'All autoloaded options are in use.', 'aaa-option-optimizer' ),
 					'noUsedButNotAutoloaded' => \esc_html__( 'All options that are used are autoloaded.', 'aaa-option-optimizer' ),
 					'noOptionsSelected'      => \esc_html__( 'No options selected.', 'aaa-option-optimizer' ),
@@ -555,6 +563,23 @@ class Admin_Page {
 					<input type="radio" name="<?php echo \esc_attr( self::OPTION_NAME ); ?>[settings][option_tracking]" value="legacy" id="aaa_option_optimizer_tracking_legacy" <?php \checked( $settings['option_tracking'], 'legacy' ); ?>>
 					<?php \esc_html_e( 'Legacy', 'aaa-option-optimizer' ); ?>
 				</label>
+			</fieldset>
+
+			<h2><?php \esc_html_e( 'Remote data', 'aaa-option-optimizer' ); ?></h2>
+			<fieldset class="aaa-option-optimizer-consent-fieldset">
+				<label for="aaa_option_optimizer_remote_data_consent">
+					<input type="checkbox" name="<?php echo \esc_attr( self::OPTION_NAME ); ?>[settings][remote_data_consent]" value="1" id="aaa_option_optimizer_remote_data_consent" <?php \checked( ! empty( $settings['remote_data_consent'] ) ); ?>>
+					<?php \esc_html_e( 'Keep the known-plugins list up to date automatically', 'aaa-option-optimizer' ); ?>
+				</label>
+				<p class="description">
+					<?php
+					printf(
+						/* translators: %s is the host the data is fetched from. */
+						\esc_html__( 'When enabled, the plugin fetches an updated known-plugins list once a day from %s, and sends your plugin and WordPress version so we can keep anonymous usage statistics. No site identity is sent. When disabled, only the list bundled with the plugin is used.', 'aaa-option-optimizer' ),
+						'<code>option-optimizer-api.progressplanner.com</code>'
+					);
+					?>
+				</p>
 			</fieldset>
 			<?php \submit_button( \__( 'Save Settings', 'aaa-option-optimizer' ) ); ?>
 		</form>

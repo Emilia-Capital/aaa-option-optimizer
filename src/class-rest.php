@@ -42,6 +42,24 @@ class REST {
 	public function register_rest_routes() {
 		\register_rest_route(
 			'aaa-option-optimizer/v1',
+			'/set-consent',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'set_consent' ],
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+				'args'                => [
+					'consent' => [
+						'required' => true,
+						'type'     => 'boolean',
+					],
+				],
+			]
+		);
+
+		\register_rest_route(
+			'aaa-option-optimizer/v1',
 			'/update-autoload',
 			[
 				'methods'             => 'POST',
@@ -203,6 +221,42 @@ class REST {
 	public function reset_stats() {
 		Plugin::get_instance()->reset();
 		return new \WP_REST_Response( [ 'success' => true ], 200 );
+	}
+
+	/**
+	 * Set the user's consent to contacting our servers.
+	 *
+	 * Persists the flag into the plugin settings and (un)schedules the daily
+	 * known-plugins refresh to match, so granting consent from the Report
+	 * popover takes effect immediately.
+	 *
+	 * @param WP_REST_Request $request The REST request.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function set_consent( $request ) {
+		$consent = (bool) $request->get_param( 'consent' );
+
+		$option                                    = \get_option( Admin_Page::OPTION_NAME, [] );
+		$option['settings']                        = isset( $option['settings'] ) ? $option['settings'] : [];
+		$option['settings']['remote_data_consent'] = $consent;
+		\update_option( Admin_Page::OPTION_NAME, $option );
+
+		if ( $consent ) {
+			if ( ! \wp_next_scheduled( Known_Plugins::CRON_HOOK ) ) {
+				\wp_schedule_event( \time(), 'daily', Known_Plugins::CRON_HOOK );
+			}
+		} elseif ( \wp_next_scheduled( Known_Plugins::CRON_HOOK ) ) {
+			\wp_clear_scheduled_hook( Known_Plugins::CRON_HOOK );
+		}
+
+		return new \WP_REST_Response(
+			[
+				'success' => true,
+				'consent' => $consent,
+			],
+			200
+		);
 	}
 
 	/**
