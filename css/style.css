@@ -136,11 +136,66 @@ div.dt-container .dt-input {
 .aaa-report-popover .aaa-report-input,
 .aaa-report-popover .aaa-report-prefix {
 	box-sizing: border-box;
+	display: block;
+	/* WP admin's .regular-text sets a fixed width; the field should fill the
+	   popover so the suggestion list lines up with it. */
 	width: 100%;
+	max-width: 100%;
 	margin-top: 4px;
 }
 .aaa-report-popover .aaa-report-prefix-field label {
 	display: block;
+}
+.aaa-report-combo {
+	/* Positioning context for the suggestion list, so it lines up with the
+	   field rather than with the popover's (asymmetric) padding box. */
+	position: relative;
+	margin: 0 0 1em;
+}
+.aaa-report-combo label {
+	display: block;
+}
+.aaa-report-list {
+	/* In-page rather than a native dropdown, so it inherits the popover's
+	   styling and always appears directly under the field. */
+	position: absolute;
+	z-index: 20;
+	left: 0;
+	right: 0;
+	margin: 2px 0 0;
+	padding: 0;
+	max-height: 220px;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	list-style: none;
+	background: #fff;
+	border: 1px solid #8c8f94;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.aaa-report-option {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px;
+	margin: 0;
+	padding: 6px 10px;
+	cursor: pointer;
+}
+.aaa-report-option:hover,
+.aaa-report-option.is-active {
+	background: #2271b1;
+	color: #fff;
+}
+.aaa-report-option__name {
+	/* The plugin name is what people recognize, so it leads. */
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+.aaa-report-option__slug {
+	flex: none;
+	font-family: monospace;
+	font-size: 12px;
+	opacity: 0.7;
 }
 .aaa-report-popover .aaa-report-status {
 	min-height: 1.2em;

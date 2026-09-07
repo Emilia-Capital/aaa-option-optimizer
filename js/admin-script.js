@@ -472,15 +472,17 @@ jQuery( document ).ready( function () {
 		return `<div id="${ popoverId }" popover class="aaa-option-optimizer-popover aaa-report-popover" data-option="${ optionName }">
 			<button type="button" class="aaa-option-optimizer-popover__close" popovertarget="${ popoverId }" popovertargetaction="hide">X</button>
 			<p><strong>${ i18n.reportOriginOf } <code>${ optionName }</code></strong></p>
-			<p>
-				<label>
+			<div class="aaa-report-combo">
+				<label for="${ popoverId }_input">
 					${ i18n.reportSlugOrUrlLabel }
-					<input type="text" class="aaa-report-input regular-text" list="${ popoverId }_list" placeholder="${ escapeHtml(
-						i18n.reportSlugPlaceholder
-					) }" autocomplete="off" />
 				</label>
-				${ renderInstalledPluginOptions( `${ popoverId }_list` ) }
-			</p>
+				<input type="text" id="${ popoverId }_input" class="aaa-report-input regular-text"
+					placeholder="${ escapeHtml( i18n.reportSlugPlaceholder ) }"
+					autocomplete="off" role="combobox" aria-expanded="false"
+					aria-controls="${ popoverId }_list" aria-autocomplete="list" />
+				<ul id="${ popoverId }_list" class="aaa-report-list" role="listbox"
+					aria-label="${ escapeHtml( i18n.reportListLabel ) }" hidden></ul>
+			</div>
 			<p class="description">${ escapeHtml( i18n.reportSlugOrUrlHelp ) }</p>
 			<div class="aaa-report-prefix-field" hidden>
 				<p>
@@ -506,37 +508,158 @@ jQuery( document ).ready( function () {
 	}
 
 	/**
-	 * Renders the datalist of installed plugins offered as suggestions in the
-	 * Report popover.
+	 * Find installed plugins matching what the user has typed.
 	 *
-	 * The option value is the slug, since that is what gets submitted and what
-	 * lands in the field when a suggestion is picked. The plugin name is shown
-	 * as the label so the list is readable. The input stays free text: plugins
-	 * that have been deleted still need to be reportable by typing their slug.
+	 * Matches on plugin name as well as slug, since people recognize
+	 * "All in One SEO" rather than `all-in-one-seo-pack`. Matches that begin
+	 * with the query sort ahead of ones that merely contain it, so typing
+	 * "seo" offers the plugins named SEO-something first.
 	 *
-	 * @param {string} listId - The id to give the datalist element.
-	 * @return {string} - The datalist HTML, or an empty string when there is
-	 *                    nothing to suggest.
+	 * @param {string} query - The current input value.
+	 * @return {Array<{slug: string, name: string}>} - Matching plugins.
 	 */
-	function renderInstalledPluginOptions( listId ) {
+	function matchInstalledPlugins( query ) {
 		const plugins = aaaOptionOptimizer.installedPlugins;
 		if ( ! plugins ) {
-			return '';
+			return [];
 		}
-		const options = Object.keys( plugins )
-			.map(
-				( slug ) =>
-					`<option value="${ escapeHtml(
-						slug
-					) }" label="${ escapeHtml( plugins[ slug ] ) }"></option>`
-			)
-			.join( '' );
-		if ( ! options ) {
-			return '';
+		const needle = String( query || '' )
+			.trim()
+			.toLowerCase();
+		const all = Object.keys( plugins ).map( ( slug ) => ( {
+			slug,
+			name: plugins[ slug ],
+		} ) );
+
+		if ( ! needle ) {
+			return all;
 		}
-		return `<datalist id="${ escapeHtml(
-			listId
-		) }">${ options }</datalist>`;
+
+		const scored = [];
+		for ( const item of all ) {
+			const slug = item.slug.toLowerCase();
+			const name = item.name.toLowerCase();
+			if ( slug.startsWith( needle ) || name.startsWith( needle ) ) {
+				scored.push( { item, rank: 0 } );
+			} else if ( slug.includes( needle ) || name.includes( needle ) ) {
+				scored.push( { item, rank: 1 } );
+			}
+		}
+		scored.sort( ( a, b ) => a.rank - b.rank );
+		return scored.map( ( entry ) => entry.item );
+	}
+
+	/**
+	 * Render the suggestion list for a popover and show or hide it.
+	 *
+	 * The list is an aid, never a gate: it closes when nothing matches so the
+	 * user is left typing into a plain text field, which is what reporting a
+	 * plugin that is no longer installed needs.
+	 *
+	 * @param {jQuery} $popover - The popover jQuery element.
+	 * @param {string} query    - The current input value.
+	 */
+	function renderReportList( $popover, query ) {
+		const matches = matchInstalledPlugins( query );
+
+		if ( ! matches.length ) {
+			closeReportList( $popover );
+			return;
+		}
+
+		const $list = $popover.find( '.aaa-report-list' );
+		const $input = $popover.find( '.aaa-report-input' );
+		const listId = $list.attr( 'id' );
+
+		$list.html(
+			matches
+				.map(
+					( item, index ) =>
+						`<li id="${ listId }_opt${ index }" class="aaa-report-option" role="option" aria-selected="false" data-slug="${ escapeHtml(
+							item.slug
+						) }"><span class="aaa-report-option__name">${ escapeHtml(
+							item.name
+						) }</span><span class="aaa-report-option__slug">${ escapeHtml(
+							item.slug
+						) }</span></li>`
+				)
+				.join( '' )
+		);
+		$list.prop( 'hidden', false );
+		$input.attr( 'aria-expanded', 'true' );
+		$popover.data( 'activeOption', -1 );
+		$input.removeAttr( 'aria-activedescendant' );
+	}
+
+	/**
+	 * Hide the suggestion list and reset its selection state.
+	 *
+	 * @param {jQuery} $popover - The popover jQuery element.
+	 */
+	function closeReportList( $popover ) {
+		const $input = $popover.find( '.aaa-report-input' );
+		$popover.find( '.aaa-report-list' ).prop( 'hidden', true ).empty();
+		$input.attr( 'aria-expanded', 'false' );
+		$input.removeAttr( 'aria-activedescendant' );
+		$popover.data( 'activeOption', -1 );
+	}
+
+	/**
+	 * Move the highlight within the open suggestion list.
+	 *
+	 * Highlighting only marks an option; it does not put it in the field, so
+	 * arrowing through the list never overwrites what the user typed until
+	 * they commit with Enter or a click.
+	 *
+	 * @param {jQuery} $popover - The popover jQuery element.
+	 * @param {number} step     - How far to move (1 down, -1 up).
+	 */
+	function moveReportListActive( $popover, step ) {
+		const $options = $popover.find( '.aaa-report-option' );
+		if ( ! $options.length ) {
+			return;
+		}
+		const current = $popover.data( 'activeOption' );
+		const index = typeof current === 'number' ? current : -1;
+		let next = index + step;
+		if ( next < 0 ) {
+			next = $options.length - 1;
+		} else if ( next >= $options.length ) {
+			next = 0;
+		}
+
+		$options.attr( 'aria-selected', 'false' ).removeClass( 'is-active' );
+		const $active = $options.eq( next );
+		$active.attr( 'aria-selected', 'true' ).addClass( 'is-active' );
+		$popover.data( 'activeOption', next );
+		$popover
+			.find( '.aaa-report-input' )
+			.attr( 'aria-activedescendant', $active.attr( 'id' ) );
+
+		const option = $active.get( 0 );
+		if ( option && option.scrollIntoView ) {
+			option.scrollIntoView( { block: 'nearest' } );
+		}
+	}
+
+	/**
+	 * Put a slug into the field and verify it straight away.
+	 *
+	 * Used when the user commits a suggestion, which is a complete value and
+	 * so does not need the typing debounce.
+	 *
+	 * @param {jQuery} $popover - The popover jQuery element.
+	 * @param {string} slug     - The slug to apply.
+	 */
+	function chooseReportSlug( $popover, slug ) {
+		const $input = $popover.find( '.aaa-report-input' );
+		$input.val( slug );
+		closeReportList( $popover );
+		const pending = $popover.data( 'verifyTimer' );
+		if ( pending ) {
+			clearTimeout( pending );
+		}
+		verifyReportSlug( $popover, normalizeSlug( slug ) );
 	}
 
 	/**
@@ -901,6 +1024,82 @@ jQuery( document ).ready( function () {
 			'verifyTimer',
 			setTimeout( () => verifyReportSlug( $popover, slug ), delay )
 		);
+
+		// Keep the suggestion list in step with what is being typed.
+		renderReportList( $popover, raw );
+	} );
+
+	// Open the list on focus so the installed plugins are discoverable
+	// without having to guess that typing reveals them.
+	jQuery( document ).on( 'focus', '.aaa-report-input', function () {
+		const $popover = jQuery( this ).closest( '.aaa-report-popover' );
+		renderReportList( $popover, jQuery( this ).val() );
+	} );
+
+	// Commit a suggestion on click.
+	jQuery( document ).on( 'mousedown', '.aaa-report-option', function ( e ) {
+		// mousedown rather than click, and prevented, so the input keeps
+		// focus and the blur handler doesn't close the list first.
+		e.preventDefault();
+		const $popover = jQuery( this ).closest( '.aaa-report-popover' );
+		chooseReportSlug( $popover, jQuery( this ).data( 'slug' ) );
+	} );
+
+	// Close the list when focus leaves the field.
+	jQuery( document ).on( 'blur', '.aaa-report-input', function () {
+		const $popover = jQuery( this ).closest( '.aaa-report-popover' );
+		setTimeout( () => closeReportList( $popover ), 120 );
+	} );
+
+	// Keyboard handling for the combobox.
+	jQuery( document ).on( 'keydown', '.aaa-report-input', function ( e ) {
+		const $popover = jQuery( this ).closest( '.aaa-report-popover' );
+		const $list = $popover.find( '.aaa-report-list' );
+		const isOpen = ! $list.prop( 'hidden' );
+
+		if ( e.key === 'ArrowDown' || e.key === 'ArrowUp' ) {
+			e.preventDefault();
+			if ( ! isOpen ) {
+				renderReportList( $popover, jQuery( this ).val() );
+				return;
+			}
+			moveReportListActive( $popover, e.key === 'ArrowDown' ? 1 : -1 );
+			return;
+		}
+
+		if ( e.key === 'Escape' ) {
+			// Close the list but leave the popover and the typed value alone.
+			if ( isOpen ) {
+				e.preventDefault();
+				e.stopPropagation();
+				closeReportList( $popover );
+			}
+			return;
+		}
+
+		if ( e.key === 'Enter' ) {
+			const active = $popover.data( 'activeOption' );
+			// Only take over Enter when an option is actually highlighted;
+			// otherwise the user is committing what they typed themselves.
+			if ( isOpen && typeof active === 'number' && active >= 0 ) {
+				e.preventDefault();
+				const slug = $popover
+					.find( '.aaa-report-option' )
+					.eq( active )
+					.data( 'slug' );
+				chooseReportSlug( $popover, slug );
+				return;
+			}
+			// A typed slug: close the list and verify it now rather than
+			// waiting out the typing debounce.
+			e.preventDefault();
+			closeReportList( $popover );
+			const pending = $popover.data( 'verifyTimer' );
+			if ( pending ) {
+				clearTimeout( pending );
+			}
+			verifyReportSlug( $popover, normalizeSlug( jQuery( this ).val() ) );
+		}
 	} );
 
 	// Re-evaluate the submit button when consent is toggled.

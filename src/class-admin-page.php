@@ -221,6 +221,11 @@ class Admin_Page {
 					'reportSlugOrUrlLabel'   => \esc_html__( 'wp.org slug or URL', 'aaa-option-optimizer' ),
 					'reportSlugPlaceholder'  => \esc_html__( 'Pick an installed plugin, or type a slug or URL', 'aaa-option-optimizer' ),
 					'reportSlugOrUrlHelp'    => \esc_html__( 'Choose from the installed plugins, or type the slug yourself if the plugin has been removed.', 'aaa-option-optimizer' ),
+					'reportListLabel'        => \esc_html__( 'Installed plugins', 'aaa-option-optimizer' ),
+					'reportNoMatches'        => \esc_html__( 'No installed plugin matches. Press Enter to use what you typed.', 'aaa-option-optimizer' ),
+					/* translators: %d: number of matching plugins. */
+					'reportMatchCount'       => \esc_html__( '%d plugins match', 'aaa-option-optimizer' ),
+					'reportMatchCountOne'    => \esc_html__( '1 plugin matches', 'aaa-option-optimizer' ),
 					'reportPrefixLabel'      => \esc_html__( 'Option prefix this plugin uses (optional)', 'aaa-option-optimizer' ),
 					'reportPrefixHelp'       => \esc_html__( 'Optional. If this plugin names its options with a shared prefix, adding it lets one report cover all of them. Leave empty to report only this option.', 'aaa-option-optimizer' ),
 					'reportVerifying'        => \esc_html__( 'Checking wp.org…', 'aaa-option-optimizer' ),
