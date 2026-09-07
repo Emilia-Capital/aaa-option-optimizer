@@ -119,6 +119,19 @@ div.dt-container .dt-input {
 	width: 480px;
 	max-width: 100%;
 	min-height: auto;
+	/* The base popover is `overflow: visible`, so on a short viewport the
+	   content spills past `max-height` and the buttons end up off-screen.
+	   Scroll the popover's own body instead. */
+	max-height: min(80vh, 100%);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+.aaa-report-popover .aaa-option-optimizer-popover__close {
+	/* Absolute positioning would scroll away with the content now that the
+	   popover scrolls; keep the close button reachable at the top. */
+	position: sticky;
+	float: right;
+	top: 0;
 }
 .aaa-report-popover .aaa-report-input,
 .aaa-report-popover .aaa-report-prefix {

@@ -416,6 +416,26 @@ jQuery( document ).ready( function () {
 	}
 
 	/**
+	 * Decode the HTML entities wordpress.org returns in plugin names.
+	 *
+	 * The API hands back already-encoded text ("Rankings &amp; Traffic"), so
+	 * escaping it for display would encode the ampersand a second time and
+	 * render a literal "&amp;". Decode first, then escape as usual.
+	 *
+	 * Uses the textarea trick rather than a regex so every named and numeric
+	 * entity is handled; assigning to `innerHTML` on a detached textarea
+	 * parses entities without executing anything or running markup.
+	 *
+	 * @param {string} value - Text that may contain HTML entities.
+	 * @return {string} - The decoded text.
+	 */
+	function decodeEntities( value ) {
+		const textarea = document.createElement( 'textarea' );
+		textarea.innerHTML = String( value || '' );
+		return textarea.value;
+	}
+
+	/**
 	 * Renders the Source column. For unknown sources, wraps the label
 	 * in a button that opens a Report Origin popover.
 	 *
@@ -730,13 +750,14 @@ jQuery( document ).ready( function () {
 					$status.text( i18n.reportNotFound );
 					return;
 				}
+				const pluginName = decodeEntities( data.name );
 				reportState[ optionName ] = {
 					slug,
-					verifiedName: data.name,
+					verifiedName: pluginName,
 				};
 				$status.html(
 					`✓ ${ i18n.reportVerified } <strong>${ escapeHtml(
-						data.name
+						pluginName
 					) }</strong>`
 				);
 				// Now that a plugin is confirmed, offer the prefix field --
