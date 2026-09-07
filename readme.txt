@@ -58,7 +58,7 @@ This plugin connects to two external services to identify the source plugins of 
 
 = WordPress.org plugin directory (api.wordpress.org) =
 
-When you click "Report" on an option whose source is "Unknown" and type a plugin slug, the plugin queries `https://api.wordpress.org/plugins/info/1.0/{slug}.json` to verify the slug exists and to display the official plugin name for confirmation. Only the slug you type is sent.
+When you click "Report" on an option whose source is "Unknown" and choose or type a plugin slug, the plugin queries `https://api.wordpress.org/plugins/info/1.0/{slug}.json` to verify the slug exists and to display the official plugin name for confirmation. Only the slug is sent. The list of installed plugins offered as suggestions in that field is read locally and is never sent anywhere.
 
 WordPress.org terms of service: https://wordpress.org/about/privacy/
 
@@ -75,6 +75,7 @@ The endpoint is operated by the plugin maintainers. The submission URL can be ov
 = 1.7.0 =
 
 * Add "Report origin" feature: for options whose source plugin is unknown, users can submit the matching wp.org slug to help maintainers expand the recognized plugins list. Submissions land as GitHub issues for maintainer review; no auto-merge.
+* The "Report origin" slug field suggests the plugins installed on your site, so the slug can be picked from a list instead of typed. The field still accepts a typed slug or wp.org URL, so options left behind by a plugin that has since been deleted remain reportable. Suggestions are read locally and never sent anywhere.
 * Recognized-plugins list can refresh once a day in the background from the maintainers' server, so the list grows for users without requiring plugin updates. This is opt-in: enable it on the settings tab or agree in the Report popover. The refresh sends only your plugin and WordPress version for anonymous statistics; no site identity is sent.
 
 = 1.6.1 =

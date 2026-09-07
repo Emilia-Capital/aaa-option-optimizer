@@ -207,6 +207,7 @@ class Admin_Page {
 				'migration'        => Database::get_migration_status(),
 				'reportUrl'        => \esc_url_raw( $report_url ),
 				'hasRemoteConsent' => Known_Plugins::has_consent(),
+				'installedPlugins' => $this->get_installed_plugins(),
 				'i18n'             => [
 					'filterBySource'         => \esc_html__( 'Filter by source', 'aaa-option-optimizer' ),
 					'showValue'              => \esc_html__( 'Show', 'aaa-option-optimizer' ),
@@ -218,7 +219,8 @@ class Admin_Page {
 					'reportOrigin'           => \esc_html__( 'Report', 'aaa-option-optimizer' ),
 					'reportOriginOf'         => \esc_html__( 'Report origin of', 'aaa-option-optimizer' ),
 					'reportSlugOrUrlLabel'   => \esc_html__( 'wp.org slug or URL', 'aaa-option-optimizer' ),
-					'reportSlugPlaceholder'  => \esc_html__( 'e.g. wp125 or https://wordpress.org/plugins/wp125/', 'aaa-option-optimizer' ),
+					'reportSlugPlaceholder'  => \esc_html__( 'Pick an installed plugin, or type a slug or URL', 'aaa-option-optimizer' ),
+					'reportSlugOrUrlHelp'    => \esc_html__( 'Choose from the installed plugins, or type the slug yourself if the plugin has been removed.', 'aaa-option-optimizer' ),
 					'reportVerifying'        => \esc_html__( 'Checking wp.org…', 'aaa-option-optimizer' ),
 					'reportNotFound'         => \esc_html__( 'Plugin not found on wordpress.org.', 'aaa-option-optimizer' ),
 					'reportVerifyError'      => \esc_html__( 'Could not verify with wordpress.org.', 'aaa-option-optimizer' ),
@@ -278,6 +280,43 @@ class Admin_Page {
 				],
 			]
 		);
+	}
+
+	/**
+	 * Build the list of installed plugins offered as Report popover suggestions.
+	 *
+	 * The array key is the plugin's directory name, which for plugins hosted on
+	 * wordpress.org matches their wp.org slug — the value the report endpoint
+	 * expects. Plugins living in a single file at the plugins root have no
+	 * directory to derive a slug from and are skipped.
+	 *
+	 * These are suggestions only. A directory name can differ from the wp.org
+	 * slug (renamed folders, plugins hosted elsewhere), so a picked slug still
+	 * goes through the same wordpress.org verification as a typed one.
+	 *
+	 * @return array<string, string> Slug => plugin name.
+	 */
+	private function get_installed_plugins(): array {
+		if ( ! \function_exists( 'get_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$plugins = [];
+		foreach ( \get_plugins() as $file => $data ) {
+			// "slug/slug.php" gives a directory to use; "single-file.php" does not.
+			if ( \strpos( $file, '/' ) === false ) {
+				continue;
+			}
+
+			$slug = \dirname( $file );
+			if ( ! isset( $plugins[ $slug ] ) ) {
+				$plugins[ $slug ] = isset( $data['Name'] ) ? (string) $data['Name'] : $slug;
+			}
+		}
+
+		\asort( $plugins, SORT_NATURAL | SORT_FLAG_CASE );
+
+		return $plugins;
 	}
 
 	/**

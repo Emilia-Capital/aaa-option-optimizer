@@ -455,11 +455,13 @@ jQuery( document ).ready( function () {
 			<p>
 				<label>
 					${ i18n.reportSlugOrUrlLabel }
-					<input type="text" class="aaa-report-input regular-text" placeholder="${ escapeHtml(
+					<input type="text" class="aaa-report-input regular-text" list="${ popoverId }_list" placeholder="${ escapeHtml(
 						i18n.reportSlugPlaceholder
 					) }" autocomplete="off" />
 				</label>
+				${ renderInstalledPluginOptions( `${ popoverId }_list` ) }
 			</p>
+			<p class="description">${ escapeHtml( i18n.reportSlugOrUrlHelp ) }</p>
 			<p class="aaa-report-status" aria-live="polite"></p>
 			<p class="description">${ escapeHtml( i18n.reportPrivacyNote ) }</p>
 			${ renderConsentField() }
@@ -472,6 +474,40 @@ jQuery( document ).ready( function () {
 				}</button>
 			</p>
 		</div>`;
+	}
+
+	/**
+	 * Renders the datalist of installed plugins offered as suggestions in the
+	 * Report popover.
+	 *
+	 * The option value is the slug, since that is what gets submitted and what
+	 * lands in the field when a suggestion is picked. The plugin name is shown
+	 * as the label so the list is readable. The input stays free text: plugins
+	 * that have been deleted still need to be reportable by typing their slug.
+	 *
+	 * @param {string} listId - The id to give the datalist element.
+	 * @return {string} - The datalist HTML, or an empty string when there is
+	 *                    nothing to suggest.
+	 */
+	function renderInstalledPluginOptions( listId ) {
+		const plugins = aaaOptionOptimizer.installedPlugins;
+		if ( ! plugins ) {
+			return '';
+		}
+		const options = Object.keys( plugins )
+			.map(
+				( slug ) =>
+					`<option value="${ escapeHtml(
+						slug
+					) }" label="${ escapeHtml( plugins[ slug ] ) }"></option>`
+			)
+			.join( '' );
+		if ( ! options ) {
+			return '';
+		}
+		return `<datalist id="${ escapeHtml(
+			listId
+		) }">${ options }</datalist>`;
 	}
 
 	/**
