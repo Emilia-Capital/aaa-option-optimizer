@@ -462,6 +462,15 @@ jQuery( document ).ready( function () {
 				${ renderInstalledPluginOptions( `${ popoverId }_list` ) }
 			</p>
 			<p class="description">${ escapeHtml( i18n.reportSlugOrUrlHelp ) }</p>
+			<p>
+				<label>
+					${ escapeHtml( i18n.reportPrefixLabel ) }
+					<input type="text" class="aaa-report-prefix regular-text" value="${ escapeHtml(
+						suggestOptionPrefix( row.name )
+					) }" autocomplete="off" />
+				</label>
+			</p>
+			<p class="description">${ escapeHtml( i18n.reportPrefixHelp ) }</p>
 			<p class="aaa-report-status" aria-live="polite"></p>
 			<p class="description">${ escapeHtml( i18n.reportPrivacyNote ) }</p>
 			${ renderConsentField() }
@@ -511,6 +520,29 @@ jQuery( document ).ready( function () {
 	}
 
 	/**
+	 * Suggest the option prefix a plugin uses, derived from an option name.
+	 *
+	 * Transient wrappers are stripped first so the suggestion describes the
+	 * underlying option rather than the caching layer, then everything through
+	 * the first separator is kept -- nearly every prefix in the mapping ends at
+	 * an underscore or a hyphen.
+	 *
+	 * This is only a starting point. It cannot tell that "wordpress_api_key"
+	 * belongs to Akismet rather than to core, so the field stays editable and
+	 * the maintainer reviewing the report sees the exact option name too.
+	 *
+	 * @param {string} optionName - The option being reported.
+	 * @return {string} - The suggested prefix, or an empty string.
+	 */
+	function suggestOptionPrefix( optionName ) {
+		const stripped = String( optionName || '' )
+			.trim()
+			.replace( /^_(?:site_)?transient_(?:timeout_)?/, '' );
+		const match = stripped.match( /^_?[a-z0-9]+[_-]/i );
+		return match ? match[ 0 ] : '';
+	}
+
+	/**
 	 * Renders the consent checkbox shown in the Report popover when the user
 	 * has not yet consented to contacting our servers. Returns an empty string
 	 * once consent has been granted (globally or earlier this session).
@@ -555,6 +587,22 @@ jQuery( document ).ready( function () {
 			return true;
 		}
 		return $popover.find( '.aaa-report-consent-input' ).is( ':checked' );
+	}
+
+	/**
+	 * The prefix the user is submitting alongside the option name.
+	 *
+	 * Prefilled with a suggestion but freely editable, so whatever comes back
+	 * here is the user's answer -- including an empty string, which means
+	 * "report just this one option".
+	 *
+	 * @param {jQuery} $popover - The popover jQuery element.
+	 * @return {string} - The prefix, or an empty string.
+	 */
+	function reportPrefixValue( $popover ) {
+		return String(
+			$popover.find( '.aaa-report-prefix' ).val() || ''
+		).trim();
 	}
 
 	/**
@@ -672,6 +720,7 @@ jQuery( document ).ready( function () {
 				contentType: 'application/json',
 				data: JSON.stringify( {
 					option_name: optionName,
+					option_prefix: reportPrefixValue( $popover ),
 					slug: state.slug,
 					site: window.location.hostname,
 				} ),
