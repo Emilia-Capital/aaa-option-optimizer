@@ -477,6 +477,7 @@ jQuery( document ).ready( function () {
 					${ i18n.reportSlugOrUrlLabel }
 				</label>
 				<input type="text" id="${ popoverId }_input" class="aaa-report-input regular-text"
+					value="${ escapeHtml( guessPluginFromOption( row.name ) ) }"
 					placeholder="${ escapeHtml( i18n.reportSlugPlaceholder ) }"
 					autocomplete="off" role="combobox" aria-expanded="false"
 					aria-controls="${ popoverId }_list" aria-autocomplete="list" />
@@ -505,6 +506,56 @@ jQuery( document ).ready( function () {
 				}</button>
 			</p>
 		</div>`;
+	}
+
+	/**
+	 * Guess which installed plugin an unknown option belongs to.
+	 *
+	 * The known-plugins mapping is maintained per prefix rather than per
+	 * plugin, so a plugin can be half-recognized: `wpseo_titles` resolves to
+	 * Yoast while `indexables_indexation_reason` right beside it does not.
+	 * The site already knows which plugins are installed, so an unrecognized
+	 * option naming one of them is a strong hint about where it came from.
+	 *
+	 * Matches the longest installed slug whose token appears in the option
+	 * name -- longest so that `elementor-pro` is preferred over `elementor`
+	 * when both are installed. Transient wrappers are stripped first, and
+	 * very short slugs are skipped because two or three letters collide with
+	 * ordinary words too easily.
+	 *
+	 * This is a guess offered as a starting point, never a mapping: it only
+	 * ever prefills the Report form, which still verifies the slug against
+	 * wordpress.org before anything can be submitted.
+	 *
+	 * @param {string} optionName - The unrecognized option name.
+	 * @return {string} - An installed plugin slug, or an empty string.
+	 */
+	function guessPluginFromOption( optionName ) {
+		const plugins = aaaOptionOptimizer.installedPlugins;
+		if ( ! plugins ) {
+			return '';
+		}
+
+		const haystack = String( optionName || '' )
+			.toLowerCase()
+			.replace( /^_(?:site_)?transient_(?:timeout_)?/, '' )
+			.replace( /[^a-z0-9]+/g, '' );
+		if ( ! haystack ) {
+			return '';
+		}
+
+		let best = '';
+		for ( const slug of Object.keys( plugins ) ) {
+			const token = slug.toLowerCase().replace( /[^a-z0-9]+/g, '' );
+			// Short tokens ("seo", "ai") match far too much to be evidence.
+			if ( token.length < 5 ) {
+				continue;
+			}
+			if ( haystack.includes( token ) && token.length > best.length ) {
+				best = slug;
+			}
+		}
+		return best;
 	}
 
 	/**
@@ -1027,6 +1078,27 @@ jQuery( document ).ready( function () {
 
 		// Keep the suggestion list in step with what is being typed.
 		renderReportList( $popover, raw );
+	} );
+
+	// Verify a prefilled guess when the Report popover is opened, so a
+	// half-recognized plugin shows up already confirmed and the user only has
+	// to agree with it.
+	//
+	// Bound to the trigger rather than the popover's own `toggle` event: that
+	// event does not bubble, so document-level delegation never sees it.
+	jQuery( document ).on( 'click', '.aaa-report-trigger', function () {
+		const popoverId = jQuery( this ).attr( 'popovertarget' );
+		const $popover = jQuery( document.getElementById( popoverId ) );
+		if ( ! $popover.length ) {
+			return;
+		}
+		const value = $popover.find( '.aaa-report-input' ).val();
+		// Only once per popover; reopening shouldn't re-query wp.org.
+		if ( ! value || $popover.data( 'guessVerified' ) ) {
+			return;
+		}
+		$popover.data( 'guessVerified', true );
+		verifyReportSlug( $popover, normalizeSlug( value ) );
 	} );
 
 	// Open the list on focus so the installed plugins are discoverable
