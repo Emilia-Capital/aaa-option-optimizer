@@ -462,15 +462,15 @@ jQuery( document ).ready( function () {
 				${ renderInstalledPluginOptions( `${ popoverId }_list` ) }
 			</p>
 			<p class="description">${ escapeHtml( i18n.reportSlugOrUrlHelp ) }</p>
-			<p>
-				<label>
-					${ escapeHtml( i18n.reportPrefixLabel ) }
-					<input type="text" class="aaa-report-prefix regular-text" value="${ escapeHtml(
-						suggestOptionPrefix( row.name )
-					) }" autocomplete="off" />
-				</label>
-			</p>
-			<p class="description">${ escapeHtml( i18n.reportPrefixHelp ) }</p>
+			<div class="aaa-report-prefix-field" hidden>
+				<p>
+					<label>
+						${ escapeHtml( i18n.reportPrefixLabel ) }
+						<input type="text" class="aaa-report-prefix regular-text" value="" autocomplete="off" />
+					</label>
+				</p>
+				<p class="description">${ escapeHtml( i18n.reportPrefixHelp ) }</p>
+			</div>
 			<p class="aaa-report-status" aria-live="polite"></p>
 			<p class="description">${ escapeHtml( i18n.reportPrivacyNote ) }</p>
 			${ renderConsentField() }
@@ -520,26 +520,72 @@ jQuery( document ).ready( function () {
 	}
 
 	/**
-	 * Suggest the option prefix a plugin uses, derived from an option name.
+	 * Prefixes that describe WordPress core's own bookkeeping rather than the
+	 * plugin an option belongs to. Core keys several transients *by* plugin
+	 * slug (`_site_transient_wp_plugin_dependencies_plugin_timeout_<slug>`),
+	 * so the leading token is core's, not the plugin's -- suggesting it would
+	 * claim a large share of core options for whichever plugin was reported.
 	 *
-	 * Transient wrappers are stripped first so the suggestion describes the
-	 * underlying option rather than the caching layer, then everything through
-	 * the first separator is kept -- nearly every prefix in the mapping ends at
-	 * an underscore or a hyphen.
+	 * @type {string[]}
+	 */
+	const CORE_PREFIXES = [
+		'wp_',
+		'update_',
+		'updates_',
+		'theme_',
+		'widget_',
+		'can_compress_',
+		'dismissed_',
+		'auto_update_',
+		'browser_',
+		'php_check_',
+		'plugin_',
+		'settings_',
+	];
+
+	/**
+	 * Suggest the option prefix a plugin uses.
 	 *
-	 * This is only a starting point. It cannot tell that "wordpress_api_key"
-	 * belongs to Akismet rather than to core, so the field stays editable and
-	 * the maintainer reviewing the report sees the exact option name too.
+	 * Derived from the option name, but only accepted when it looks like it
+	 * actually belongs to the plugin the user picked: either it starts with a
+	 * recognizable piece of the slug, or the option simply starts with the
+	 * slug's own token. Anything that resolves to one of core's own prefixes
+	 * is discarded rather than suggested.
+	 *
+	 * Returning an empty string is a normal outcome and means "no confident
+	 * suggestion" -- the field is left blank for the user to fill in or leave
+	 * alone, and an empty prefix reports just the one option.
 	 *
 	 * @param {string} optionName - The option being reported.
+	 * @param {string} slug       - The verified wp.org slug.
 	 * @return {string} - The suggested prefix, or an empty string.
 	 */
-	function suggestOptionPrefix( optionName ) {
+	function suggestOptionPrefix( optionName, slug ) {
 		const stripped = String( optionName || '' )
 			.trim()
 			.replace( /^_(?:site_)?transient_(?:timeout_)?/, '' );
 		const match = stripped.match( /^_?[a-z0-9]+[_-]/i );
-		return match ? match[ 0 ] : '';
+		if ( ! match ) {
+			return '';
+		}
+
+		const candidate = match[ 0 ];
+		if ( CORE_PREFIXES.includes( candidate.toLowerCase() ) ) {
+			return '';
+		}
+
+		// Only suggest a prefix that plausibly belongs to the picked plugin:
+		// the slug's tokens and the candidate should share a leading stem.
+		const token = candidate.toLowerCase().replace( /[^a-z0-9]/g, '' );
+		const slugTokens = String( slug || '' )
+			.toLowerCase()
+			.split( '-' )
+			.filter( Boolean );
+		const related = slugTokens.some(
+			( part ) => part.startsWith( token ) || token.startsWith( part )
+		);
+
+		return related ? candidate : '';
 	}
 
 	/**
@@ -648,6 +694,8 @@ jQuery( document ).ready( function () {
 
 		reportState[ optionName ] = { slug: '', verifiedName: '' };
 		$submit.prop( 'disabled', true );
+		// The prefix belongs to a confirmed plugin; hide it until there is one.
+		$popover.find( '.aaa-report-prefix-field' ).prop( 'hidden', true );
 
 		if ( ! slug ) {
 			$status.text( '' );
@@ -679,6 +727,14 @@ jQuery( document ).ready( function () {
 						data.name
 					) }</strong>`
 				);
+				// Now that a plugin is confirmed, offer the prefix field --
+				// prefilled only when the suggestion relates to that plugin.
+				$popover
+					.find( '.aaa-report-prefix' )
+					.val( suggestOptionPrefix( optionName, slug ) );
+				$popover
+					.find( '.aaa-report-prefix-field' )
+					.prop( 'hidden', false );
 				$submit.prop( 'disabled', ! reportCanSubmit( $popover ) );
 			} )
 			.fail( function () {

@@ -222,7 +222,7 @@ class Admin_Page {
 					'reportSlugPlaceholder'  => \esc_html__( 'Pick an installed plugin, or type a slug or URL', 'aaa-option-optimizer' ),
 					'reportSlugOrUrlHelp'    => \esc_html__( 'Choose from the installed plugins, or type the slug yourself if the plugin has been removed.', 'aaa-option-optimizer' ),
 					'reportPrefixLabel'      => \esc_html__( 'Option prefix this plugin uses (optional)', 'aaa-option-optimizer' ),
-					'reportPrefixHelp'       => \esc_html__( 'Sent as a suggestion so one report can cover every option sharing this prefix. Correct it if it looks wrong, or clear it to report just this option.', 'aaa-option-optimizer' ),
+					'reportPrefixHelp'       => \esc_html__( 'Optional. If this plugin names its options with a shared prefix, adding it lets one report cover all of them. Leave empty to report only this option.', 'aaa-option-optimizer' ),
 					'reportVerifying'        => \esc_html__( 'Checking wp.org…', 'aaa-option-optimizer' ),
 					'reportNotFound'         => \esc_html__( 'Plugin not found on wordpress.org.', 'aaa-option-optimizer' ),
 					'reportVerifyError'      => \esc_html__( 'Could not verify with wordpress.org.', 'aaa-option-optimizer' ),
