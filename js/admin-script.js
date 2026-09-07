@@ -695,6 +695,10 @@ jQuery( document ).ready( function () {
 		reportState[ optionName ] = { slug: '', verifiedName: '' };
 		$submit.prop( 'disabled', true );
 		// The prefix belongs to a confirmed plugin; hide it until there is one.
+		const pendingReveal = $popover.data( 'revealTimer' );
+		if ( pendingReveal ) {
+			clearTimeout( pendingReveal );
+		}
 		$popover.find( '.aaa-report-prefix-field' ).prop( 'hidden', true );
 
 		if ( ! slug ) {
@@ -703,6 +707,8 @@ jQuery( document ).ready( function () {
 		}
 
 		$status.text( i18n.reportVerifying );
+
+		const $input = $popover.find( '.aaa-report-input' );
 
 		jQuery
 			.ajax( {
@@ -714,6 +720,12 @@ jQuery( document ).ready( function () {
 				timeout: 8000,
 			} )
 			.done( function ( data ) {
+				// The field may have moved on while this was in flight --
+				// typing "progress-planner" passes through "progress", which
+				// is itself a real slug. Only the current value may write.
+				if ( normalizeSlug( $input.val() ) !== slug ) {
+					return;
+				}
 				if ( ! data || data.error || ! data.name ) {
 					$status.text( i18n.reportNotFound );
 					return;
@@ -729,15 +741,32 @@ jQuery( document ).ready( function () {
 				);
 				// Now that a plugin is confirmed, offer the prefix field --
 				// prefilled only when the suggestion relates to that plugin.
-				$popover
-					.find( '.aaa-report-prefix' )
-					.val( suggestOptionPrefix( optionName, slug ) );
-				$popover
-					.find( '.aaa-report-prefix-field' )
-					.prop( 'hidden', false );
+				// Deferred so it doesn't flash in and out mid-word when a
+				// half-typed slug happens to be a real plugin.
+				const previousReveal = $popover.data( 'revealTimer' );
+				if ( previousReveal ) {
+					clearTimeout( previousReveal );
+				}
+				$popover.data(
+					'revealTimer',
+					setTimeout( function () {
+						if ( normalizeSlug( $input.val() ) !== slug ) {
+							return;
+						}
+						$popover
+							.find( '.aaa-report-prefix' )
+							.val( suggestOptionPrefix( optionName, slug ) );
+						$popover
+							.find( '.aaa-report-prefix-field' )
+							.prop( 'hidden', false );
+					}, REPORT_PREFIX_REVEAL_DELAY )
+				);
 				$submit.prop( 'disabled', ! reportCanSubmit( $popover ) );
 			} )
 			.fail( function () {
+				if ( normalizeSlug( $input.val() ) !== slug ) {
+					return;
+				}
 				$status.text( i18n.reportVerifyError );
 			} );
 	}
@@ -810,7 +839,21 @@ jQuery( document ).ready( function () {
 
 	// Debounced wp.org verification on input change. Per-popover timer so
 	// concurrently-open popovers don't cancel each other's verification.
-	jQuery( document ).on( 'input', '.aaa-report-input', function () {
+	//
+	// Typing a slug by hand passes through many prefixes that are themselves
+	// valid-looking slugs, and querying each one reports "Plugin not found"
+	// for a name the user is still in the middle of writing. Wait long enough
+	// for a pause in typing. Picking from the datalist or pasting a URL
+	// delivers a complete value in one event, so those verify promptly.
+	const REPORT_TYPING_DELAY = 900;
+	const REPORT_COMPLETE_DELAY = 150;
+	// The prefix field is a second question, asked only once the first is
+	// settled. Revealing it the moment a slug happens to verify makes it
+	// appear and disappear while the user is still typing, so wait a beat
+	// longer than the verification itself.
+	const REPORT_PREFIX_REVEAL_DELAY = 400;
+
+	jQuery( document ).on( 'input', '.aaa-report-input', function ( event ) {
 		const $popover = jQuery( this ).closest( '.aaa-report-popover' );
 		const raw = jQuery( this ).val();
 		const slug = normalizeSlug( raw );
@@ -818,9 +861,24 @@ jQuery( document ).ready( function () {
 		if ( previous ) {
 			clearTimeout( previous );
 		}
+
+		// A datalist pick or a paste arrives whole rather than character by
+		// character; `inputType` is absent or non-insertText for those.
+		const inputType = event.originalEvent && event.originalEvent.inputType;
+		const typedOneChar = inputType === 'insertText';
+		const delay = typedOneChar
+			? REPORT_TYPING_DELAY
+			: REPORT_COMPLETE_DELAY;
+
+		// Clear a stale "not found" while the user is still typing, so the
+		// popover doesn't argue with a half-written slug.
+		if ( typedOneChar ) {
+			$popover.find( '.aaa-report-status' ).text( '' );
+		}
+
 		$popover.data(
 			'verifyTimer',
-			setTimeout( () => verifyReportSlug( $popover, slug ), 350 )
+			setTimeout( () => verifyReportSlug( $popover, slug ), delay )
 		);
 	} );
 

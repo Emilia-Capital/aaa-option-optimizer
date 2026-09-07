@@ -112,12 +112,22 @@ div.dt-container .dt-input {
 	color: #135e96;
 }
 .aaa-report-popover {
-	min-width: 380px;
+	/* Fixed rather than content-driven: the prefix field is revealed after the
+	   plugin is confirmed, and a width that grows with it would resize the
+	   popover mid-interaction. */
+	box-sizing: border-box;
+	width: 480px;
+	max-width: 100%;
 	min-height: auto;
 }
-.aaa-report-popover .aaa-report-input {
+.aaa-report-popover .aaa-report-input,
+.aaa-report-popover .aaa-report-prefix {
+	box-sizing: border-box;
 	width: 100%;
 	margin-top: 4px;
+}
+.aaa-report-popover .aaa-report-prefix-field label {
+	display: block;
 }
 .aaa-report-popover .aaa-report-status {
 	min-height: 1.2em;
