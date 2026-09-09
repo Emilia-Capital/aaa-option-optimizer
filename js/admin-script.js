@@ -1008,11 +1008,49 @@ jQuery( document ).ready( function () {
 			} )
 			.done( function () {
 				$status.text( i18n.reportThanks );
+				closeReportPopover( $popover, REPORT_SUBMITTED_CLOSE_DELAY );
 			} )
 			.fail( function ( jqXHR ) {
 				$status.text( reportFailureMessage( jqXHR ) );
 				$submit.prop( 'disabled', false );
 			} );
+	}
+
+	/**
+	 * Dismiss a popover once its report has been accepted.
+	 *
+	 * The popover is a native [popover] element, so it is closed the same way
+	 * the Cancel button closes it rather than by hiding the node -- anything
+	 * else would leave the browser believing it is still open.
+	 *
+	 * By the time the delay elapses the user may have dismissed it themselves
+	 * (Esc, or a click outside), and hidePopover() throws on an element that
+	 * is no longer open, so check before calling. The timer is kept per
+	 * popover so a pending close is dropped if the row is redrawn.
+	 *
+	 * @param {jQuery} $popover - The popover jQuery element.
+	 * @param {number} delay    - Milliseconds to wait before closing.
+	 */
+	function closeReportPopover( $popover, delay ) {
+		const previous = $popover.data( 'closeTimer' );
+		if ( previous ) {
+			clearTimeout( previous );
+		}
+		$popover.data(
+			'closeTimer',
+			setTimeout( function () {
+				const el = $popover[ 0 ];
+				if ( ! el || ! el.isConnected ) {
+					return;
+				}
+				// :popover-open is the only reliable read of open state; the
+				// attribute stays put whether or not the popover is showing.
+				if ( ! el.matches( ':popover-open' ) ) {
+					return;
+				}
+				el.hidePopover();
+			}, delay )
+		);
 	}
 
 	/**
@@ -1075,6 +1113,11 @@ jQuery( document ).ready( function () {
 	// appear and disappear while the user is still typing, so wait a beat
 	// longer than the verification itself.
 	const REPORT_PREFIX_REVEAL_DELAY = 400;
+	// A submitted report is finished business, so the popover closes itself
+	// rather than leaving "Cancel" as the only way out of a completed task.
+	// Long enough that the thanks message is readable, and that a screen
+	// reader has begun announcing the aria-live status, before it goes.
+	const REPORT_SUBMITTED_CLOSE_DELAY = 1500;
 
 	jQuery( document ).on( 'input', '.aaa-report-input', function ( event ) {
 		const $popover = jQuery( this ).closest( '.aaa-report-popover' );
@@ -1119,6 +1162,13 @@ jQuery( document ).ready( function () {
 		const $popover = jQuery( document.getElementById( popoverId ) );
 		if ( ! $popover.length ) {
 			return;
+		}
+		// The element is reused across opens, so a close still pending from a
+		// previous submission would otherwise shut this one as it appears.
+		const pendingClose = $popover.data( 'closeTimer' );
+		if ( pendingClose ) {
+			clearTimeout( pendingClose );
+			$popover.removeData( 'closeTimer' );
 		}
 		const value = $popover.find( '.aaa-report-input' ).val();
 		// Only once per popover; reopening shouldn't re-query wp.org.
