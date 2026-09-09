@@ -1009,10 +1009,38 @@ jQuery( document ).ready( function () {
 			.done( function () {
 				$status.text( i18n.reportThanks );
 			} )
-			.fail( function () {
-				$status.text( i18n.reportFailed );
+			.fail( function ( jqXHR ) {
+				$status.text( reportFailureMessage( jqXHR ) );
 				$submit.prop( 'disabled', false );
 			} );
+	}
+
+	/**
+	 * Turn a failed submission into something the user can act on.
+	 *
+	 * The endpoint explains why it refused a submission ("Invalid
+	 * option_name", "Rate limit exceeded"); showing only "please try again"
+	 * hides that and invites a retry that cannot succeed. Prefer the server's
+	 * reason and fall back to the generic message when there isn't one.
+	 *
+	 * @param {Object} jqXHR - The failed jQuery XHR object.
+	 * @return {string} - The message to display.
+	 */
+	function reportFailureMessage( jqXHR ) {
+		const generic = aaaOptionOptimizer.i18n.reportFailed;
+		const reason =
+			jqXHR &&
+			jqXHR.responseJSON &&
+			typeof jqXHR.responseJSON.error === 'string'
+				? jqXHR.responseJSON.error.trim()
+				: '';
+
+		if ( ! reason ) {
+			return generic;
+		}
+		// The reason comes from the reporting endpoint, so keep it visibly
+		// attributed rather than presenting it as the plugin's own wording.
+		return `${ generic } (${ reason })`;
 	}
 
 	/**
