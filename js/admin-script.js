@@ -1383,7 +1383,26 @@ jQuery( document ).ready( function () {
 			clearTimeout( pendingClose );
 			$popover.removeData( 'closeTimer' );
 		}
-		const value = $popover.find( '.aaa-report-input' ).val();
+		const $input = $popover.find( '.aaa-report-input' );
+
+		// Put the caret in the slug field, which is the only thing to do here.
+		// This click runs before the popover is shown, and focusing a hidden
+		// element does nothing, so hand the focus over once the browser has
+		// opened it. Focus also opens the suggestion list, which is the point:
+		// the installed plugins are visible without having to guess that
+		// typing reveals them.
+		window.requestAnimationFrame( function () {
+			const el = $popover[ 0 ];
+			if ( ! el || ! el.matches( ':popover-open' ) ) {
+				return;
+			}
+			// Select rather than just focus: a prefilled slug is a suggestion,
+			// so typing replaces it outright while the caret still lands at
+			// the end for anyone who wants to edit it instead.
+			$input.trigger( 'focus' ).trigger( 'select' );
+		} );
+
+		const value = $input.val();
 		// Only once per popover; reopening shouldn't re-query wp.org.
 		if ( ! value || $popover.data( 'guessVerified' ) ) {
 			return;
