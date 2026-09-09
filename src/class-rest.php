@@ -80,6 +80,10 @@ class REST {
 						'required' => false,
 						'type'     => 'string',
 					],
+					'prefix'      => [
+						'required' => false,
+						'type'     => 'string',
+					],
 				],
 			]
 		);
@@ -311,6 +315,7 @@ class REST {
 		$option_name = \sanitize_text_field( (string) $request->get_param( 'option_name' ) );
 		$slug        = \sanitize_key( (string) $request->get_param( 'slug' ) );
 		$plugin_name = \sanitize_text_field( (string) $request->get_param( 'plugin_name' ) );
+		$prefix      = \sanitize_text_field( (string) $request->get_param( 'prefix' ) );
 
 		if ( '' === $option_name || '' === $slug ) {
 			return new \WP_REST_Response(
@@ -322,7 +327,7 @@ class REST {
 			);
 		}
 
-		Admin_Page::record_reported_option( $option_name, $slug, $plugin_name );
+		Admin_Page::record_reported_option( $option_name, $slug, $plugin_name, $prefix );
 
 		return new \WP_REST_Response( [ 'success' => true ], 200 );
 	}

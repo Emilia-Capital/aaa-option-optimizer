@@ -125,10 +125,11 @@ class Admin_Page {
 	 * @param string $option_name The option that was reported.
 	 * @param string $slug        The wp.org slug it was reported as.
 	 * @param string $plugin_name The plugin name shown at verification time.
+	 * @param string $prefix      The option prefix the report covered, if given.
 	 *
 	 * @return void
 	 */
-	public static function record_reported_option( string $option_name, string $slug, string $plugin_name ): void {
+	public static function record_reported_option( string $option_name, string $slug, string $plugin_name, string $prefix = '' ): void {
 		$option = \get_option( self::OPTION_NAME, [] );
 
 		$reported = isset( $option['reported_options'] ) && \is_array( $option['reported_options'] )
@@ -138,11 +139,48 @@ class Admin_Page {
 		$reported[ $option_name ] = [
 			'slug'     => $slug,
 			'name'     => $plugin_name,
+			'prefix'   => $prefix,
 			'reported' => \gmdate( 'c' ),
 		];
 
 		$option['reported_options'] = $reported;
 		\update_option( self::OPTION_NAME, $option );
+	}
+
+	/**
+	 * The option prefixes this site has reported, and what they were reported as.
+	 *
+	 * A report that names a prefix is the user telling us which plugin owns a
+	 * whole family of options. That is first-hand evidence about this site, so
+	 * the sibling options can be prefilled from it while the submission waits
+	 * for a maintainer to publish the prefix to the shared mapping.
+	 *
+	 * Longest prefix first, so a more specific report wins over a broader one.
+	 *
+	 * @return array<string, array<string, string>> Reported plugin data, keyed by prefix.
+	 */
+	public static function get_reported_prefixes(): array {
+		$prefixes = [];
+
+		foreach ( self::get_reported_options() as $record ) {
+			if ( empty( $record['prefix'] ) || empty( $record['slug'] ) ) {
+				continue;
+			}
+
+			$prefixes[ $record['prefix'] ] = [
+				'slug' => $record['slug'],
+				'name' => isset( $record['name'] ) ? $record['name'] : '',
+			];
+		}
+
+		\uksort(
+			$prefixes,
+			static function ( $a, $b ) {
+				return \strlen( (string) $b ) <=> \strlen( (string) $a );
+			}
+		);
+
+		return $prefixes;
 	}
 
 	/**
@@ -254,6 +292,7 @@ class Admin_Page {
 				'reportUrl'        => \esc_url_raw( $report_url ),
 				'hasRemoteConsent' => Known_Plugins::has_consent(),
 				'reportedOptions'  => self::get_reported_options(),
+				'reportedPrefixes' => self::get_reported_prefixes(),
 				'installedPlugins' => $this->get_installed_plugins(),
 				'i18n'             => [
 					'filterBySource'         => \esc_html__( 'Filter by source', 'aaa-option-optimizer' ),

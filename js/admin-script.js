@@ -564,6 +564,40 @@ jQuery( document ).ready( function () {
 	}
 
 	/**
+	 * The slug an option's prefix was reported as, if this site reported one.
+	 *
+	 * Transient wrappers are stripped first so `_transient_csmgr_occ_...`
+	 * matches a `csmgr_` report the same way the bare option would.
+	 *
+	 * @param {string} optionName - The option name.
+	 *
+	 * @return {string} - The reported slug, or an empty string.
+	 */
+	function reportedPrefixSlug( optionName ) {
+		const prefixes = aaaOptionOptimizer.reportedPrefixes;
+		if ( ! prefixes ) {
+			return '';
+		}
+
+		const stripped = String( optionName || '' )
+			.trim()
+			.replace( /^_(?:site_)?transient_(?:timeout_)?/, '' );
+		if ( ! stripped ) {
+			return '';
+		}
+
+		// PHP hands these over longest-first, so the first hit is the most
+		// specific prefix rather than merely the first one declared.
+		for ( const prefix of Object.keys( prefixes ) ) {
+			if ( prefix && stripped.indexOf( prefix ) === 0 ) {
+				return prefixes[ prefix ].slug || '';
+			}
+		}
+
+		return '';
+	}
+
+	/**
 	 * Guess which installed plugin an unknown option belongs to.
 	 *
 	 * The known-plugins mapping is maintained per prefix rather than per
@@ -586,6 +620,16 @@ jQuery( document ).ready( function () {
 	 * @return {string} - An installed plugin slug, or an empty string.
 	 */
 	function guessPluginFromOption( optionName ) {
+		// A prefix this site has already reported is first-hand evidence, so it
+		// outranks guessing from the slug. It also reaches cases the guess
+		// cannot: an abbreviated prefix like `csmgr_` shares no substring with
+		// the slug `squadeno-club-sports-manager`, so only the user's own
+		// earlier report connects the two.
+		const reportedSlug = reportedPrefixSlug( optionName );
+		if ( reportedSlug ) {
+			return reportedSlug;
+		}
+
 		const plugins = aaaOptionOptimizer.installedPlugins;
 		if ( ! plugins ) {
 			return '';
@@ -813,6 +857,22 @@ jQuery( document ).ready( function () {
 		const stripped = String( optionName || '' )
 			.trim()
 			.replace( /^_(?:site_)?transient_(?:timeout_)?/, '' );
+
+		// If this site already reported a prefix for this plugin, reuse it
+		// verbatim. The user established that pairing themselves, so it needs
+		// no corroboration from the slug -- and abbreviated prefixes only ever
+		// get here by this route.
+		const prefixes = aaaOptionOptimizer.reportedPrefixes || {};
+		for ( const prefix of Object.keys( prefixes ) ) {
+			if (
+				prefix &&
+				prefixes[ prefix ].slug === slug &&
+				stripped.indexOf( prefix ) === 0
+			) {
+				return prefix;
+			}
+		}
+
 		const match = stripped.match( /^_?[a-z0-9]+[_-]/i );
 		if ( ! match ) {
 			return '';
@@ -1063,7 +1123,12 @@ jQuery( document ).ready( function () {
 			} )
 			.done( function () {
 				$status.text( i18n.reportThanks );
-				recordReport( optionName, state.slug, state.verifiedName );
+				recordReport(
+					optionName,
+					state.slug,
+					state.verifiedName,
+					reportPrefixValue( $popover )
+				);
 				closeReportPopover( $popover, REPORT_SUBMITTED_CLOSE_DELAY );
 			} )
 			.fail( function ( jqXHR ) {
@@ -1143,6 +1208,46 @@ jQuery( document ).ready( function () {
 	 * effort — a failure here doesn't block the report the user just made.
 	 */
 	/**
+	 * Fill in the sibling popovers that share a freshly reported prefix.
+	 *
+	 * The popovers are built once by the DataTables render callback, so their
+	 * inputs already hold the values that were correct when the table drew --
+	 * empty, for a prefix nothing had reported yet. Reporting one option is
+	 * exactly when its siblings become knowable, and making the user reload to
+	 * see that would waste the thing they just told us.
+	 *
+	 * Only untouched inputs are filled: anything the user has already typed
+	 * into another popover is theirs, not ours to overwrite.
+	 *
+	 * @param {string} sourceOption - The option that was just reported.
+	 * @param {string} prefix       - The prefix the report covered.
+	 * @param {string} slug         - The slug it was reported as.
+	 */
+	function applyReportedPrefix( sourceOption, prefix, slug ) {
+		jQuery( '.aaa-report-popover' ).each( function () {
+			const $popover = jQuery( this );
+			const optionName = $popover.data( 'option' );
+			if ( ! optionName || optionName === sourceOption ) {
+				return;
+			}
+
+			const stripped = String( optionName ).replace(
+				/^_(?:site_)?transient_(?:timeout_)?/,
+				''
+			);
+			if ( stripped.indexOf( prefix ) !== 0 ) {
+				return;
+			}
+
+			const $input = $popover.find( '.aaa-report-input' );
+			if ( $input.val() ) {
+				return;
+			}
+			$input.val( slug );
+		} );
+	}
+
+	/**
 	 * Remember locally that this option has been reported.
 	 *
 	 * Kept separate from the submission itself: the report went to an external
@@ -1153,8 +1258,9 @@ jQuery( document ).ready( function () {
 	 * @param {string} optionName - The option that was reported.
 	 * @param {string} slug       - The slug it was reported as.
 	 * @param {string} pluginName - The verified plugin name.
+	 * @param {string} prefix     - The option prefix the report covered, if any.
 	 */
-	function recordReport( optionName, slug, pluginName ) {
+	function recordReport( optionName, slug, pluginName, prefix ) {
 		// Update the in-memory copy too, so a redraw before the next page load
 		// already shows the reported state.
 		if ( ! aaaOptionOptimizer.reportedOptions ) {
@@ -1163,7 +1269,20 @@ jQuery( document ).ready( function () {
 		aaaOptionOptimizer.reportedOptions[ optionName ] = {
 			slug,
 			name: pluginName || '',
+			prefix: prefix || '',
 		};
+		// Mirror it into the prefix map too, then push it into the popovers that
+		// are already on the page.
+		if ( prefix ) {
+			if ( ! aaaOptionOptimizer.reportedPrefixes ) {
+				aaaOptionOptimizer.reportedPrefixes = {};
+			}
+			aaaOptionOptimizer.reportedPrefixes[ prefix ] = {
+				slug,
+				name: pluginName || '',
+			};
+			applyReportedPrefix( optionName, prefix, slug );
+		}
 
 		jQuery.ajax( {
 			url: `${ aaaOptionOptimizer.root }aaa-option-optimizer/v1/record-report`,
@@ -1175,6 +1294,7 @@ jQuery( document ).ready( function () {
 				option_name: optionName,
 				slug,
 				plugin_name: pluginName || '',
+				prefix: prefix || '',
 			} ),
 		} );
 	}
