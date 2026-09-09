@@ -444,18 +444,52 @@ jQuery( document ).ready( function () {
 	 * @return {string} - The HTML for the source column.
 	 */
 	let reportPopoverSeq = 0;
+
+	/**
+	 * The report this site has already sent for an option, if any.
+	 *
+	 * Reports go to an external endpoint that never reports back, so a record
+	 * here means "we sent this", never "this was accepted".
+	 *
+	 * @param {string} optionName - The option name.
+	 *
+	 * @return {Object|null} - The stored report, or null when never reported.
+	 */
+	function reportedRecord( optionName ) {
+		const reported = aaaOptionOptimizer.reportedOptions;
+		if (
+			! reported ||
+			! Object.prototype.hasOwnProperty.call( reported, optionName )
+		) {
+			return null;
+		}
+		return reported[ optionName ] || null;
+	}
+
 	function renderSourceColumn( row ) {
 		const label = escapeHtml( row.plugin );
 		if ( row.plugin_known ) {
 			return label;
 		}
 		const popoverId = `aaa_report_${ ++reportPopoverSeq }`;
+		const i18n = aaaOptionOptimizer.i18n;
+		const record = reportedRecord( row.name );
+		// An already-reported option keeps its trigger -- the report may have
+		// named the wrong plugin -- but says so rather than inviting a first
+		// report that has in fact already been sent.
+		const action = record ? i18n.reportReported : i18n.reportOrigin;
+		const triggerClass = record
+			? 'aaa-report-trigger is-reported'
+			: 'aaa-report-trigger';
+		const title = record
+			? ` title="${ escapeHtml( i18n.reportReportedPending ) }"`
+			: '';
 		return `${ renderReportPopover( row, popoverId ) }
-			<button type="button" class="aaa-report-trigger" popovertarget="${ popoverId }" data-option="${ escapeHtml(
+			<button type="button" class="${ triggerClass }" popovertarget="${ popoverId }" data-option="${ escapeHtml(
 				row.name
-			) }">${ label }<span class="aaa-report-trigger__action">${
-				aaaOptionOptimizer.i18n.reportOrigin
-			}</span></button>`;
+			) }"${ title }>${ label }<span class="aaa-report-trigger__action">${ escapeHtml(
+				action
+			) }</span></button>`;
 	}
 
 	/**
@@ -469,15 +503,36 @@ jQuery( document ).ready( function () {
 	function renderReportPopover( row, popoverId ) {
 		const i18n = aaaOptionOptimizer.i18n;
 		const optionName = escapeHtml( row.name );
+		const record = reportedRecord( row.name );
+		// Prefill with what was actually reported, so reopening shows the
+		// previous answer rather than re-guessing from the option name.
+		const initialSlug =
+			record && record.slug
+				? record.slug
+				: guessPluginFromOption( row.name );
+		// Only a note -- not a lock. The stored name is what the user chose at
+		// submission time, which is exactly what they need to see to judge
+		// whether it was right.
+		const reportedNote = record
+			? `<p class="aaa-report-reported description">${ escapeHtml(
+					i18n.reportReportedAs
+			  ).replace(
+					'%s',
+					`<strong>${ escapeHtml(
+						record.name || record.slug
+					) }</strong>`
+			  ) }</p>`
+			: '';
 		return `<div id="${ popoverId }" popover class="aaa-option-optimizer-popover aaa-report-popover" data-option="${ optionName }">
 			<button type="button" class="aaa-option-optimizer-popover__close" popovertarget="${ popoverId }" popovertargetaction="hide">X</button>
 			<p><strong>${ i18n.reportOriginOf } <code>${ optionName }</code></strong></p>
+			${ reportedNote }
 			<div class="aaa-report-combo">
 				<label for="${ popoverId }_input">
 					${ i18n.reportSlugOrUrlLabel }
 				</label>
 				<input type="text" id="${ popoverId }_input" class="aaa-report-input regular-text"
-					value="${ escapeHtml( guessPluginFromOption( row.name ) ) }"
+					value="${ escapeHtml( initialSlug ) }"
 					placeholder="${ escapeHtml( i18n.reportSlugPlaceholder ) }"
 					autocomplete="off" role="combobox" aria-expanded="false"
 					aria-controls="${ popoverId }_list" aria-autocomplete="list" />
@@ -1008,6 +1063,7 @@ jQuery( document ).ready( function () {
 			} )
 			.done( function () {
 				$status.text( i18n.reportThanks );
+				recordReport( optionName, state.slug, state.verifiedName );
 				closeReportPopover( $popover, REPORT_SUBMITTED_CLOSE_DELAY );
 			} )
 			.fail( function ( jqXHR ) {
@@ -1086,6 +1142,43 @@ jQuery( document ).ready( function () {
 	 * the rest of this page session so further popovers don't ask again. Best
 	 * effort — a failure here doesn't block the report the user just made.
 	 */
+	/**
+	 * Remember locally that this option has been reported.
+	 *
+	 * Kept separate from the submission itself: the report went to an external
+	 * endpoint, and this is only the site's own note that it was sent, so the
+	 * table can say "Reported" after a reload. Best-effort -- a failure here
+	 * costs a label, not the report, so it is not surfaced to the user.
+	 *
+	 * @param {string} optionName - The option that was reported.
+	 * @param {string} slug       - The slug it was reported as.
+	 * @param {string} pluginName - The verified plugin name.
+	 */
+	function recordReport( optionName, slug, pluginName ) {
+		// Update the in-memory copy too, so a redraw before the next page load
+		// already shows the reported state.
+		if ( ! aaaOptionOptimizer.reportedOptions ) {
+			aaaOptionOptimizer.reportedOptions = {};
+		}
+		aaaOptionOptimizer.reportedOptions[ optionName ] = {
+			slug,
+			name: pluginName || '',
+		};
+
+		jQuery.ajax( {
+			url: `${ aaaOptionOptimizer.root }aaa-option-optimizer/v1/record-report`,
+			method: 'POST',
+			contentType: 'application/json',
+			beforeSend: ( xhr ) =>
+				xhr.setRequestHeader( 'X-WP-Nonce', aaaOptionOptimizer.nonce ),
+			data: JSON.stringify( {
+				option_name: optionName,
+				slug,
+				plugin_name: pluginName || '',
+			} ),
+		} );
+	}
+
 	function persistConsent() {
 		aaaOptionOptimizer.hasRemoteConsent = true;
 		jQuery.ajax( {

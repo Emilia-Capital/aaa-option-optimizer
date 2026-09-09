@@ -111,6 +111,23 @@ div.dt-container .dt-input {
 .aaa-report-trigger:focus-visible .aaa-report-trigger__action {
 	color: #135e96;
 }
+/* Already reported: still a link, because a wrong slug needs correcting, but
+   muted so it reads as a state rather than a call to action. */
+.aaa-report-trigger.is-reported .aaa-report-trigger__action {
+	color: #646970;
+	text-decoration: none;
+}
+.aaa-report-trigger.is-reported .aaa-report-trigger__action::before {
+	content: "\2713\00a0";
+}
+.aaa-report-trigger.is-reported:hover .aaa-report-trigger__action,
+.aaa-report-trigger.is-reported:focus-visible .aaa-report-trigger__action {
+	color: #135e96;
+	text-decoration: underline;
+}
+.aaa-report-reported {
+	margin-top: 0;
+}
 .aaa-report-popover {
 	/* Fixed rather than content-driven: the prefix field is revealed after the
 	   plugin is confirmed, and a width that grows with it would resize the

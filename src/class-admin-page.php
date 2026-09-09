@@ -100,6 +100,52 @@ class Admin_Page {
 	}
 
 	/**
+	 * Get the options this site has already reported.
+	 *
+	 * Reports are POSTed to an external endpoint which never reports back, so
+	 * this record is only ever "we sent this", not "this was accepted". It is
+	 * kept beside `settings` rather than inside it so the settings page, which
+	 * saves that subarray wholesale, cannot drop it.
+	 *
+	 * @return array<string, array<string, string>> Reported options, keyed by option name.
+	 */
+	public static function get_reported_options(): array {
+		$option   = \get_option( self::OPTION_NAME, [] );
+		$reported = isset( $option['reported_options'] ) ? $option['reported_options'] : [];
+
+		return \is_array( $reported ) ? $reported : [];
+	}
+
+	/**
+	 * Record that an option has been reported from this site.
+	 *
+	 * Re-reporting is allowed -- a user who picked the wrong plugin needs a way
+	 * to correct it -- so an existing entry is overwritten rather than kept.
+	 *
+	 * @param string $option_name The option that was reported.
+	 * @param string $slug        The wp.org slug it was reported as.
+	 * @param string $plugin_name The plugin name shown at verification time.
+	 *
+	 * @return void
+	 */
+	public static function record_reported_option( string $option_name, string $slug, string $plugin_name ): void {
+		$option = \get_option( self::OPTION_NAME, [] );
+
+		$reported = isset( $option['reported_options'] ) && \is_array( $option['reported_options'] )
+			? $option['reported_options']
+			: [];
+
+		$reported[ $option_name ] = [
+			'slug'     => $slug,
+			'name'     => $plugin_name,
+			'reported' => \gmdate( 'c' ),
+		];
+
+		$option['reported_options'] = $reported;
+		\update_option( self::OPTION_NAME, $option );
+	}
+
+	/**
 	 * Get option tracking.
 	 *
 	 * @return string Option tracking.
@@ -207,6 +253,7 @@ class Admin_Page {
 				'migration'        => Database::get_migration_status(),
 				'reportUrl'        => \esc_url_raw( $report_url ),
 				'hasRemoteConsent' => Known_Plugins::has_consent(),
+				'reportedOptions'  => self::get_reported_options(),
 				'installedPlugins' => $this->get_installed_plugins(),
 				'i18n'             => [
 					'filterBySource'         => \esc_html__( 'Filter by source', 'aaa-option-optimizer' ),
@@ -217,6 +264,10 @@ class Admin_Page {
 					'createOptionFalse'      => \esc_html__( 'Create option with value false', 'aaa-option-optimizer' ),
 					'unknownLabel'           => \esc_html__( 'Unknown', 'aaa-option-optimizer' ),
 					'reportOrigin'           => \esc_html__( 'Report', 'aaa-option-optimizer' ),
+					'reportReported'         => \esc_html__( 'Reported', 'aaa-option-optimizer' ),
+					/* translators: %s: plugin name the option was reported as. */
+					'reportReportedAs'       => \esc_html__( 'Reported as %s. Awaiting review -- submit again to correct it.', 'aaa-option-optimizer' ),
+					'reportReportedPending'  => \esc_html__( 'Reported, awaiting review', 'aaa-option-optimizer' ),
 					'reportOriginOf'         => \esc_html__( 'Report origin of', 'aaa-option-optimizer' ),
 					'reportSlugOrUrlLabel'   => \esc_html__( 'wp.org slug or URL', 'aaa-option-optimizer' ),
 					'reportSlugPlaceholder'  => \esc_html__( 'Pick an installed plugin, or type a slug or URL', 'aaa-option-optimizer' ),

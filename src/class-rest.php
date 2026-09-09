@@ -60,6 +60,32 @@ class REST {
 
 		\register_rest_route(
 			'aaa-option-optimizer/v1',
+			'/record-report',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'record_report' ],
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+				'args'                => [
+					'option_name' => [
+						'required' => true,
+						'type'     => 'string',
+					],
+					'slug'        => [
+						'required' => true,
+						'type'     => 'string',
+					],
+					'plugin_name' => [
+						'required' => false,
+						'type'     => 'string',
+					],
+				],
+			]
+		);
+
+		\register_rest_route(
+			'aaa-option-optimizer/v1',
 			'/update-autoload',
 			[
 				'methods'             => 'POST',
@@ -267,6 +293,38 @@ class REST {
 	public function migrate_chunk() {
 		$result = Database::migrate_chunk();
 		return new \WP_REST_Response( $result, 200 );
+	}
+
+	/**
+	 * Record that an unknown option has been reported from this site.
+	 *
+	 * The report itself goes to an external endpoint which never reports back,
+	 * so this only remembers that the user sent one -- enough for the table to
+	 * say so after a reload instead of offering "Report" as though nothing had
+	 * happened. Re-reporting stays possible so a wrong slug can be corrected.
+	 *
+	 * @param WP_REST_Request $request The REST request.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function record_report( $request ) {
+		$option_name = \sanitize_text_field( (string) $request->get_param( 'option_name' ) );
+		$slug        = \sanitize_key( (string) $request->get_param( 'slug' ) );
+		$plugin_name = \sanitize_text_field( (string) $request->get_param( 'plugin_name' ) );
+
+		if ( '' === $option_name || '' === $slug ) {
+			return new \WP_REST_Response(
+				[
+					'success' => false,
+					'error'   => 'option_name and slug are required.',
+				],
+				400
+			);
+		}
+
+		Admin_Page::record_reported_option( $option_name, $slug, $plugin_name );
+
+		return new \WP_REST_Response( [ 'success' => true ], 200 );
 	}
 
 	/**
